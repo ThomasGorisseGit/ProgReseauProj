@@ -9,6 +9,7 @@ typedef struct Joueur {
     char* nom;
     int score;
     int* socket;
+    char* buffer;
 } Joueur;
 
 typedef struct Case {

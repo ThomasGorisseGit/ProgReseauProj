@@ -10,9 +10,9 @@
 #include "awale.h"
 #include <assert.h>
 typedef struct {
-    int* socket1;
-    int* socket2;
-} Sockets;
+    Joueur** joueurs;
+    int nbJoueurs;
+} Lobby;
 
 
 
@@ -118,6 +118,14 @@ void* start(void *arg) {
     
 }
 
+void afficherListeJoueurs(Lobby* lobby) {
+    printf("Liste des joueurs connectés:\n");
+    for (int i = 0; i < lobby->nbJoueurs; i++) {
+        printf("Joueur %d: %s\n", i, lobby->joueurs[i]->nom);
+    }
+}
+void afficherListeCommandes(){
+}
 int main(int argc, char** argv) {
     int sockfd, *newsockfd;
     struct sockaddr_in serv_addr, cli_addr;
@@ -152,10 +160,9 @@ int main(int argc, char** argv) {
     listen(sockfd, 5);
     printf("listen ok\n");
 
-
-    int nbClient = 0;
-    Sockets sockets;  // Structure pour les sockets
-    while (nbClient < 2) {
+    Lobby* lobby = malloc(sizeof(Lobby));
+    lobby->nbJoueurs = 0;
+    while (1) {
         clilen = sizeof(cli_addr);
         int* newsockfd = malloc(sizeof(int));
         *newsockfd = accept(sockfd, (struct sockaddr*)&cli_addr, &clilen);
@@ -164,16 +171,16 @@ int main(int argc, char** argv) {
             free(newsockfd);
             continue;
         }
-        if (nbClient == 0) {
-            sockets.socket1 = newsockfd;
-        } else if (nbClient == 1) {
-            sockets.socket2 = newsockfd;
-        }        
         printf("New connection accepted\n");
-        nbClient++;
+        Joueur * joueur = lobby->joueurs[lobby->nbJoueurs];
+        joueur = malloc(sizeof(Joueur));
+        joueur->socket = newsockfd;
+        lobby->nbJoueurs++;
+        afficherListeJoueurs(lobby);
+        client_says(joueur->socket, joueur->buffer , "/listeCommandes");
+
     }
 
-    assert(nbClient == 2);
     // Commence la partie
     pthread_t game_thread;
     pthread_create(&game_thread, NULL, start, (void*)&sockets);
