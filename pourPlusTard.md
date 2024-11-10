@@ -12,3 +12,11 @@ On doit écouter en permanance tout ce qui ce passe chez tous les clients et red
 Pour cela on doit avoir une structure qui permet de savoir où on en est (qui joue avec qui etc...)
 
 Mettre un status a chaque joueur ( en partie, en attente, sur un lobby ...)
+
+```
+gcc -o socket_server -o server.c awale.c util.c -lpthread
+```
+
+```
+gcc -o socket_client -o client.c util.c
+```
