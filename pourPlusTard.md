@@ -14,7 +14,7 @@ Pour cela on doit avoir une structure qui permet de savoir où on en est (qui jo
 Mettre un status a chaque joueur ( en partie, en attente, sur un lobby ...)
 
 ```
-gcc -o socket_server server.c awale.c util.c -lpthread
+gcc -o socket_server server.c communication.c awale.c util.c -lpthread
 ```
 
 ```
