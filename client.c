@@ -23,12 +23,10 @@ void afficher_guide()
     printf(COLOR_GREEN "/listeJoueurs" COLOR_RESET " - Liste les joueurs dans le lobby\n");
     printf(COLOR_GREEN "/defier <nom>" COLOR_RESET " - Défi un joueur spécifié par son nom\n");
 }
-
-// Fonction pour traiter les messages reçus du serveur
 void handle_message(char *message, int *sockfd)
 {
-    char command[50], destinataire[50], body[150];
-    if (verifierFormatMessage(message, command, destinataire, body))
+    char command[50], destinataire[50], body[150], expediteur[50];
+    if (verifierFormatMessage(message, command, destinataire, body, expediteur))
     {
         if (strcmp(command, "joining") == 0)
         {
@@ -40,12 +38,21 @@ void handle_message(char *message, int *sockfd)
         }
         else if (strcmp(command, "defier") == 0)
         {
-            printf(COLOR_RED "Défi reçu de %s : %s\n" COLOR_RESET, destinataire, body);
-            // TODO renvoyer la réponse et set l'état des joueurs en fonction de ça.
-        }
-        else if (strcmp(command, "listeJoueurs") == 0)
-        {
-            printf(COLOR_GREEN "Liste des joueurs disponibles :\n%s\n" COLOR_RESET, body);
+            printf(COLOR_RED "Défi reçu de %s : %s\n" COLOR_RESET, expediteur, body);
+            // Demander une réponse de l'utilisateur
+            char response[10];
+            printf("Accepter le défi ? (1 pour oui, 0 pour non) : ");
+            fgets(response, sizeof(response), stdin);
+            response[strcspn(response, "\n")] = 0;
+
+            if (strcmp(response, "1") == 0)
+            {
+                ecrire(sockfd, "accepterDefi", expediteur, "Le défi est accepté.", destinataire);
+            }
+            else
+            {
+                ecrire(sockfd, "declinerDefi", expediteur, "Le défi est refusé.", destinataire);
+            }
         }
         else
         {
@@ -95,14 +102,11 @@ int main(int argc, char **argv)
     fgets(nom, sizeof(nom), stdin);
     nom[strcspn(nom, "\n")] = '\0'; // Supprimer le saut de ligne
 
-    // Envoyer la commande de nom au serveur
-    ecrire(&sockfd, "name", "server", nom);
+    // Envoyer la commande de nom au serveur avec l’expéditeur
+    ecrire(&sockfd, "name", "server", nom, nom);
 
     fd_set readfds;
     char buffer[1024];
-
-    // Affiche le guide à l'utilisateur
-    afficher_guide();
 
     while (1)
     {
@@ -146,15 +150,15 @@ int main(int argc, char **argv)
             fgets(user_input, sizeof(user_input), stdin);
             user_input[strcspn(user_input, "\n")] = 0; // Supprime le saut de ligne
 
-            // Vérifie la commande et l'envoie au serveur
+            // Vérifie la commande et l'envoie au serveur avec le nom comme expéditeur
             if (strcmp(user_input, "/listeJoueurs") == 0)
             {
-                ecrire(&sockfd, "listeJoueurs", "server", "");
+                ecrire(&sockfd, "listeJoueurs", "server", "", nom);
             }
             else if (strncmp(user_input, "/defier ", 7) == 0)
             {
                 char *target = user_input + 8; // Extrait le nom cible
-                ecrire(&sockfd, "defier", "server", target);
+                ecrire(&sockfd, "defier", target, "", nom);
             }
             else if (strcmp(user_input, "/help") == 0)
             {

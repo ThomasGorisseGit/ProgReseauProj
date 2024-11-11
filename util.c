@@ -1,7 +1,7 @@
 #include "util.h"
-int verifierFormatMessage(char *message, char *command, char *destinataire, char *body)
+
+int verifierFormatMessage(char *message, char *command, char *destinataire, char *body, char *expediteur)
 {
-    // Nettoyer le message
     size_t len = strlen(message);
     while (len > 0 && (message[len - 1] == '\n' || message[len - 1] == ' '))
     {
@@ -9,46 +9,52 @@ int verifierFormatMessage(char *message, char *command, char *destinataire, char
         len--;
     }
 
-    // Utiliser strtok pour diviser le message en parties
-    char *token = strtok(message, " "); // Sépare au premier espace
+    char *token = strtok(message, " ");
     if (token == NULL || token[0] != '/')
     {
-        return 0; // Mauvais format de commande
+        return 0;
     }
-    strcpy(command, token + 1); // Enlever le '/' et copier la commande
+    strcpy(command, token + 1);
 
-    token = strtok(NULL, " "); // Le destinataire
+    token = strtok(NULL, " ");
     if (token == NULL || token[0] != '#')
     {
-        return 0; // Mauvais format de destinataire
+        return 0;
     }
-    strcpy(destinataire, token + 1); // Enlever le '#' et copier le destinataire
+    strcpy(destinataire, token + 1);
 
-    token = strtok(NULL, ""); // Reste du message (body), qui peut être vide
+    token = strtok(NULL, " ");
+    if (token == NULL || token[0] != '#')
+    {
+        return 0;
+    }
+    strcpy(expediteur, token + 1);
+
+    token = strtok(NULL, "");
     if (token == NULL)
     {
-        body[0] = '\0'; // Pas de message (body), on met une chaîne vide
+        body[0] = '\0';
     }
     else
     {
-        strcpy(body, token); // Copier le corps du message
+        strcpy(body, token);
     }
 
-    return 1; // Succès
+    return 1;
 }
 
-void ecrire(int *socket, char *command, char *destinataire, char *body)
+void ecrire(int *socket, char *command, char *destinataire, char *body, char *expediteur)
 {
-    char message[MAX_BODY_SIZE + MAX_COMMAND_SIZE + MAX_DESTINATAIRE_SIZE + 3];
+    char message[MAX_BODY_SIZE + MAX_COMMAND_SIZE + MAX_DESTINATAIRE_SIZE + MAX_DESTINATAIRE_SIZE + 4];
     int n;
 
-    // Formatte le message avec le command, destinataire et body
-    sprintf(message, "/%s #%s %s", command, destinataire, body);
+    // Construire le message avec l'expéditeur inclus
+    sprintf(message, "/%s #%s #%s %s", command, destinataire, expediteur, body);
     n = write(*socket, message, strlen(message));
-    printf("Message envoyé:%s\n", message);
+    printf("Message envoyé: %s\n", message);
     if (n < 0)
     {
-        perror("ERROR writing to socket");
+        perror("Erreur d'écriture sur le socket");
         exit(1);
     }
 }

@@ -13,4 +13,6 @@ Joueur *defierJoueur(Lobby *lobby, char *pseudo);
 // Initialise la partie Awale
 int initialiserPartie(Jeu *jeu);
 
+Joueur *trouverJoueurParNom(Lobby *lobby, const char *nom);
+
 #endif // PARTIE_H

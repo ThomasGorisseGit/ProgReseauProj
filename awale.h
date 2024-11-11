@@ -15,7 +15,7 @@ typedef struct Joueur
     char *nom;
     int score;
     int *socket;
-    Status *status;
+    Status status;
 } Joueur;
 
 typedef struct Case

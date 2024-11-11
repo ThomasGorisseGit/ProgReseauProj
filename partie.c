@@ -59,3 +59,16 @@ int initialiserPartie(Jeu *jeu)
     printf("La partie est prête à commencer.\n");
     return 1; // Retourne 1 pour indiquer que l'initialisation est réussie
 }
+
+// Fonction pour trouver un joueur par son nom dans le lobby
+Joueur *trouverJoueurParNom(Lobby *lobby, const char *nom)
+{
+    for (int i = 0; i < lobby->nbJoueurs; i++)
+    {
+        if (strcmp(lobby->joueurs[i]->nom, nom) == 0) // Comparaison des noms
+        {
+            return lobby->joueurs[i]; // Retourne le joueur trouvé
+        }
+    }
+    return NULL; // Retourne NULL si le joueur n'est pas trouvé
+}

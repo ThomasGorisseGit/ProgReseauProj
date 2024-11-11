@@ -52,7 +52,6 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
     Joueur *joueur = malloc(sizeof(Joueur));
     joueur->socket = newsockfd;
     joueur->nom = malloc(MAX_NAME_SIZE * sizeof(char));
-    joueur->status = malloc(sizeof(Status));
 
     strcpy(joueur->nom, "Anonyme");
     joueur->status = LOBBY;
@@ -66,8 +65,9 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
     if (*newsockfd > *max_fd)
         *max_fd = *newsockfd;
 
-    envoyer(joueur, "/name #server Entrez votre nom : ");
+    envoyer(joueur, "/name #server #serveur Entrez votre nom : ");
 }
+
 void handle_message(Lobby *lobby, fd_set *readfds)
 {
     for (int i = 0; i < lobby->nbJoueurs; i++)
@@ -76,7 +76,6 @@ void handle_message(Lobby *lobby, fd_set *readfds)
         char message[MAX_MESSAGE_SIZE];
         int n;
 
-        // Vérifie si le joueur a envoyé un message
         if (FD_ISSET(*joueur->socket, readfds))
         {
             n = read(*joueur->socket, message, MAX_MESSAGE_SIZE);
@@ -85,74 +84,95 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                 perror("Erreur de lecture du socket");
                 continue;
             }
-            if (n == 0) // Si le client se déconnecte
+            if (n == 0)
             {
                 printf("Client déconnecté\n");
-                if (*joueur->socket >= 0)
-                {
-                    FD_CLR(*joueur->socket, readfds);
-                    close(*joueur->socket);
-                }
+                close(*joueur->socket);
+                FD_CLR(*joueur->socket, readfds);
                 free(joueur->nom);
                 free(joueur);
-                lobby->joueurs[i] = lobby->joueurs[lobby->nbJoueurs - 1];
-                lobby->nbJoueurs--;
+                lobby->joueurs[i] = lobby->joueurs[--lobby->nbJoueurs];
                 i--;
                 continue;
             }
 
-            // Assure que le message est une chaîne de caractères valide
             message[n] = '\0';
-
-            // Affiche le message brut reçu dans la console du serveur
             printf("Message reçu de %s: %s\n", joueur->nom, message);
 
-            // Analyse le message pour extraire commande, destinataire et corps
-            char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE];
-            if (verifierFormatMessage(message, command, destinataire, body))
+            char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE], expediteur[MAX_NAME_SIZE];
+            if (verifierFormatMessage(message, command, destinataire, body, expediteur))
             {
-                // Traitement des différentes commandes
                 if (strcmp(command, "name") == 0)
                 {
                     strcpy(joueur->nom, body);
                     printf("Nom du joueur %d mis à jour : %s\n", i, joueur->nom);
 
+                    // Envoi du message "joining" proprement formaté
                     char join_msg[MAX_MESSAGE_SIZE];
-                    snprintf(join_msg, sizeof(join_msg), "/joining #server Un nouveau joueur a rejoint le lobby : %s", joueur->nom);
+                    snprintf(join_msg, sizeof(join_msg), "/joining #server #%s Un nouveau joueur a rejoint le lobby : %s", joueur->nom, joueur->nom);
                     envoyerATousDansLobby(lobby, join_msg);
 
                     char lobby_msg[MAX_MESSAGE_SIZE];
-                    snprintf(lobby_msg, sizeof(lobby_msg), "/displayLobby #server %s", toStringLobby(lobby));
+                    snprintf(lobby_msg, sizeof(lobby_msg), "/displayLobby #server #%s %s", joueur->nom, toStringLobby(lobby));
                     envoyer(joueur, lobby_msg);
                 }
+
                 else if (strcmp(command, "listeJoueurs") == 0)
                 {
-                    // Affiche la liste des joueurs dans le lobby
                     char liste_message[MAX_MESSAGE_SIZE];
-                    snprintf(liste_message, sizeof(liste_message), "/listeJoueurs #server %s", toStringJoueursDispo(lobby));
+                    snprintf(liste_message, sizeof(liste_message), "/listeJoueurs #server #%s %s", joueur->nom, toStringLobby(lobby));
                     envoyer(joueur, liste_message);
                 }
+
                 else if (strcmp(command, "defier") == 0)
                 {
-                    printf("Le corps du message est : %s\n", body);
-                    Joueur *defie = defierJoueur(lobby, body);
-                    if (strcmp(joueur->nom, body) == 0)
+                    Joueur *defie = defierJoueur(lobby, destinataire);
+                    if (strcmp(joueur->nom, destinataire) == 0)
                     {
                         char defier_msg[MAX_MESSAGE_SIZE];
-                        snprintf(defier_msg, sizeof(defier_msg), "/defier #%s Vous ne pouvez pas vous défier vous même.", joueur->nom);
+                        snprintf(defier_msg, sizeof(defier_msg), "/defier #%s #%s Vous ne pouvez pas vous défier vous-même.", joueur->nom, joueur->nom);
                         envoyer(joueur, defier_msg);
                     }
                     else if (defie != NULL)
                     {
+                        defie->status = DEFI;
+                        joueur->status = DEFI;
                         char defier_msg[MAX_MESSAGE_SIZE];
-                        snprintf(defier_msg, sizeof(defier_msg), "/defier #%s Le joueur %s veut vous défier. Pour accepter tapez 1, pour refuser tapez 0.", defie->nom, joueur->nom);
+                        snprintf(defier_msg, sizeof(defier_msg), "/defier #%s #%s Le joueur %s veut vous défier. Pour accepter, tapez 1 ; pour refuser, tapez 0.", defie->nom, joueur->nom, joueur->nom);
                         envoyer(defie, defier_msg);
                     }
                     else
                     {
                         char error_msg[MAX_MESSAGE_SIZE];
-                        snprintf(error_msg, sizeof(error_msg), "/error #server Le joueur %s n'est pas disponible pour un défi.", body);
+                        snprintf(error_msg, sizeof(error_msg), "/message #%s #serveur Le joueur %s n'est pas disponible pour un défi.", joueur->nom, destinataire);
                         envoyer(joueur, error_msg);
+                    }
+                }
+
+                else if (strcmp(command, "declinerDefi") == 0)
+                {
+                    Joueur *demandeur = trouverJoueurParNom(lobby, destinataire);
+                    if (demandeur != NULL)
+                    {
+                        char msg[MAX_MESSAGE_SIZE];
+                        snprintf(msg, sizeof(msg), "/message #%s #server %s a refusé votre défi.", demandeur->nom, joueur->nom);
+                        envoyer(demandeur, msg);
+                        demandeur->status = LOBBY;
+                        joueur->status = LOBBY;
+                    }
+                }
+
+                else if (strcmp(command, "accepterDefi") == 0)
+                {
+                    Joueur *demandeur = trouverJoueurParNom(lobby, destinataire);
+                    if (demandeur != NULL)
+                    {
+                        char msg[MAX_MESSAGE_SIZE];
+                        snprintf(msg, sizeof(msg), "/message #%s #server %s a accepté votre défi.", demandeur->nom, joueur->nom);
+                        envoyer(demandeur, msg);
+                        demandeur->status = PARTIE;
+                        joueur->status = PARTIE;
+                        // Initialiser la partie si nécessaire
                     }
                 }
 
