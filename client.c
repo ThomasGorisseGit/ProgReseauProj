@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "communication.h"
 
 #include "util.h"
 
@@ -30,12 +31,16 @@ void handle_message(char *message, int *sockfd)
     else if (strcmp(command, "displayLobby") == 0)
     {
       printf("%s\n", body);
+      printf("Ecrivez ce que vouis voulez faire");
+      ecrire(sockfd, "listeJoueurs", "server");
     }
     else if (strcmp(command, "defi") == 0)
     {
       ecrire(sockfd, command, destinataire);
     }
-    else
+    else if(strcmp(command, "listeJoueurs") == 0){
+      printf("%s\n", body);
+    } else
     {
       printf("Commande inconnue\n");
       printf("Commandes possibles : name, joining, displayLobby, defi\n");

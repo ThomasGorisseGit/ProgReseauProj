@@ -12,9 +12,8 @@
 #include "util.h"
 #include "communication.h"
 #include "server.h"
-#define MAX_NAME_SIZE 48
-#define MAX_MESSAGE_SIZE 1024
-#define MAX_PLAYER 10
+#include "partie.h"
+
 
 char *toStringLobby(Lobby *lobby)
 {
@@ -119,6 +118,13 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                     char message2[MAX_MESSAGE_SIZE];
                     strcpy(message2, "/displayLobby #server ");
                     strcat(message2, toStringLobby(lobby));
+                    envoyer(joueur, message2);
+                    
+                } else if(strcmp(command, "listeJoueurs")==0){
+                    printf("Les joueurs dispos sont :");
+                    char message2[MAX_MESSAGE_SIZE];
+                    strcpy(message2, "/listeJoueurs #server ");
+                    strcat(message2, toStringJoueursDispo(lobby));
                     envoyer(joueur, message2);
                 }
             }
