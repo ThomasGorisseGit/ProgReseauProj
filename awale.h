@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-typedef enum EStatus
+typedef enum
 {
     LOBBY,
     PARTIE,

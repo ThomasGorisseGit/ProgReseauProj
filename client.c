@@ -16,14 +16,30 @@
 void handle_message(char *message, int *sockfd)
 {
   char command[50], destinataire[50], body[150];
-
   if (verifierFormatMessage(message, command, destinataire, body))
   {
-    // SI nom
-    // SI lobby
-    // SI défi
-    printf("%s\n", body);
-    ecrire(sockfd, command, destinataire);
+    if (strcmp(command, "name") == 0)
+    {
+      printf("%s\n", body);
+      ecrire(sockfd, command, destinataire);
+    }
+    else if (strcmp(command, "joining") == 0)
+    {
+      printf("%s\n", body);
+    }
+    else if (strcmp(command, "displayLobby") == 0)
+    {
+      printf("%s\n", body);
+    }
+    else if (strcmp(command, "defi") == 0)
+    {
+      ecrire(sockfd, command, destinataire);
+    }
+    else
+    {
+      printf("Commande inconnue\n");
+      printf("Commandes possibles : name, joining, displayLobby, defi\n");
+    }
   }
   else
   {
@@ -62,8 +78,8 @@ int main(int argc, char **argv)
 
   while (1)
   {
-    char *buffer = malloc(256 * sizeof(char));
-    int n = read(sockfd, buffer, 256);
+    char *buffer = malloc(1024 * sizeof(char));
+    int n = read(sockfd, buffer, 1024);
     if (n < 0)
     {
       printf("Error reading from socket\n");

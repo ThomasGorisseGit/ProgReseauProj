@@ -112,12 +112,15 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                     strcpy(joueur->nom, body);
                     printf("Nom du joueur %d : %s\n", i, joueur->nom);
                     char message[MAX_MESSAGE_SIZE];
-                    strcpy(message, "/displayLobby #server ");
-                    strcat(message, toStringLobby(lobby));
+                    strcpy(message, "/joining #server Un nouveau joueur a rejoint le lobby : \t");
+                    strcat(message, joueur->nom);
                     envoyerATousDansLobby(lobby, message);
-                    printf("Envoie de %s", message);
+
+                    char message2[MAX_MESSAGE_SIZE];
+                    strcpy(message2, "/displayLobby #server ");
+                    strcat(message2, toStringLobby(lobby));
+                    envoyer(joueur, message2);
                 }
-                // LA
             }
         }
     }
