@@ -77,12 +77,13 @@ void handle_message(Lobby *lobby, fd_set *readfds)
         char message[MAX_MESSAGE_SIZE];
         int n;
 
+        // Vérifie si le joueur a envoyé un message
         if (FD_ISSET(*joueur->socket, readfds))
         {
             n = read(*joueur->socket, message, MAX_MESSAGE_SIZE);
             if (n < 0)
             {
-                perror("ERROR reading from socket");
+                perror("Erreur de lecture du socket");
                 continue;
             }
             if (n == 0) // Si le client se déconnecte
@@ -101,32 +102,50 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                 continue;
             }
 
+            // Assure que le message est une chaîne de caractères valide
             message[n] = '\0';
+
+            // Affiche le message brut reçu dans la console du serveur
+            printf("Message reçu de %s: %s\n", joueur->nom, message);
+
+            // Analyse le message pour extraire commande, destinataire et corps
             char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE];
             if (verifierFormatMessage(message, command, destinataire, body))
             {
+                // Traitement des différentes commandes
                 if (strcmp(command, "name") == 0)
                 {
                     strcpy(joueur->nom, body);
-                    printf("Nom du joueur %d : %s\n", i, joueur->nom);
-                    char joining_message[MAX_MESSAGE_SIZE];
-                    snprintf(joining_message, sizeof(joining_message), "/joining #server Un nouveau joueur a rejoint le lobby : %s", joueur->nom);
-                    envoyerATousDansLobby(lobby, joining_message);
-
-                    char lobby_message[MAX_MESSAGE_SIZE];
-                    snprintf(lobby_message, sizeof(lobby_message), "/displayLobby #server %s", toStringLobby(lobby));
-                    envoyer(joueur, lobby_message);
+                    printf("Nom du joueur %d mis à jour : %s\n", i, joueur->nom);
                     
-                } else if (strcmp(command, "listeJoueurs") == 0) {
-                    printf("recetion cote serveur ");
-                    char *liste_message = toStringJoueursDispo(lobby);
-                    envoyer(joueur, liste_message);
-                    free(liste_message);
+                    char join_msg[MAX_MESSAGE_SIZE];
+                    snprintf(join_msg, sizeof(join_msg), "/joining #server Un nouveau joueur a rejoint le lobby : %s", joueur->nom);
+                    envoyerATousDansLobby(lobby, join_msg);
+
+                    char lobby_msg[MAX_MESSAGE_SIZE];
+                    snprintf(lobby_msg, sizeof(lobby_msg), "/displayLobby #server %s", toStringLobby(lobby));
+                    envoyer(joueur, lobby_msg);
                 }
+                else if (strcmp(command, "listeJoueurs") == 0)
+                {
+                    // Affiche la liste des joueurs dans le lobby
+                    char liste_message[MAX_MESSAGE_SIZE];
+                    snprintf(liste_message, sizeof(liste_message), "/listeJoueurs #server %s", toStringJoueursDispo(lobby));
+                    envoyer(joueur, liste_message);
+                }
+                else
+                {
+                    printf("Commande inconnue reçue: %s\n", command);
+                }
+            }
+            else
+            {
+                printf("Format de message invalide reçu: %s\n", message);
             }
         }
     }
 }
+
 
 int main(int argc, char **argv)
 {

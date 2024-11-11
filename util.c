@@ -1,5 +1,4 @@
 #include "util.h"
-
 int verifierFormatMessage(char *message, char *command, char *destinataire, char *body)
 {
     // Nettoyer le message
@@ -10,13 +9,12 @@ int verifierFormatMessage(char *message, char *command, char *destinataire, char
         len--;
     }
 
-    // Utiliser strtok pour diviser le message
-    char *token = strtok(message, " "); // On sépare au premier espace
+    // Utiliser strtok pour diviser le message en parties
+    char *token = strtok(message, " "); // Sépare au premier espace
     if (token == NULL || token[0] != '/')
     {
         return 0; // Mauvais format de commande
     }
-
     strcpy(command, token + 1); // Enlever le '/' et copier la commande
 
     token = strtok(NULL, " "); // Le destinataire
@@ -24,16 +22,17 @@ int verifierFormatMessage(char *message, char *command, char *destinataire, char
     {
         return 0; // Mauvais format de destinataire
     }
-
     strcpy(destinataire, token + 1); // Enlever le '#' et copier le destinataire
 
-    token = strtok(NULL, ""); // Reste du message (body)
+    token = strtok(NULL, ""); // Reste du message (body), qui peut être vide
     if (token == NULL)
     {
-        return 0; // Pas de message (body) trouvé
+        body[0] = '\0'; // Pas de message (body), on met une chaîne vide
     }
-
-    strcpy(body, token); // Copier le corps du message
+    else
+    {
+        strcpy(body, token); // Copier le corps du message
+    }
 
     return 1; // Succès
 }
