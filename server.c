@@ -67,9 +67,8 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
     if (*newsockfd > *max_fd)
         *max_fd = *newsockfd;
 
-    envoyer(joueur, "/name #server Entrez votre nom");
+    envoyer(joueur, "/name #server Entrez votre nom : ");
 }
-
 void handle_message(Lobby *lobby, fd_set *readfds)
 {
     for (int i = 0; i < lobby->nbJoueurs; i++)
@@ -110,27 +109,25 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                 {
                     strcpy(joueur->nom, body);
                     printf("Nom du joueur %d : %s\n", i, joueur->nom);
-                    char message[MAX_MESSAGE_SIZE];
-                    strcpy(message, "/joining #server Un nouveau joueur a rejoint le lobby : \t");
-                    strcat(message, joueur->nom);
-                    envoyerATousDansLobby(lobby, message);
+                    char joining_message[MAX_MESSAGE_SIZE];
+                    snprintf(joining_message, sizeof(joining_message), "/joining #server Un nouveau joueur a rejoint le lobby : %s", joueur->nom);
+                    envoyerATousDansLobby(lobby, joining_message);
 
-                    char message2[MAX_MESSAGE_SIZE];
-                    strcpy(message2, "/displayLobby #server ");
-                    strcat(message2, toStringLobby(lobby));
-                    envoyer(joueur, message2);
+                    char lobby_message[MAX_MESSAGE_SIZE];
+                    snprintf(lobby_message, sizeof(lobby_message), "/displayLobby #server %s", toStringLobby(lobby));
+                    envoyer(joueur, lobby_message);
                     
-                } else if(strcmp(command, "listeJoueurs")==0){
-                    printf("Les joueurs dispos sont :");
-                    char message2[MAX_MESSAGE_SIZE];
-                    strcpy(message2, "/listeJoueurs #server ");
-                    strcat(message2, toStringJoueursDispo(lobby));
-                    envoyer(joueur, message2);
+                } else if (strcmp(command, "listeJoueurs") == 0) {
+                    printf("recetion cote serveur ");
+                    char *liste_message = toStringJoueursDispo(lobby);
+                    envoyer(joueur, liste_message);
+                    free(liste_message);
                 }
             }
         }
     }
 }
+
 int main(int argc, char **argv)
 {
     int sockfd;

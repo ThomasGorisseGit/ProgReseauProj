@@ -22,23 +22,6 @@ char* toStringJoueursDispo(Lobby *lobby)
     return message;
 }
 
-// Envoie un défi à un joueur spécifique par son nom
-int defierJoueur(Lobby *lobby, char *nomJoueur, Joueur *joueurSource) {
-    for (int i = 0; i < lobby->nbJoueurs; i++) {
-        Joueur *joueur = lobby->joueurs[i];
-        
-        if (joueur->status == LOBBY && strcmp(joueur->nom, nomJoueur) == 0) {
-            char command[] = "defier";
-            char destinataire[100];
-            snprintf(destinataire, sizeof(destinataire), "%s", nomJoueur);
-            
-            ecrire(joueur->socket, command, destinataire); // Envoie la commande de défi formatée
-            return 1; // Succès
-        }
-    }
-    return -1; // Joueur non trouvé ou non en LOBBY
-}
-
 // Initialise la partie Awale
 int initialiserPartie(Jeu *jeu) {
     printf("Initialisation de la partie...\n");
