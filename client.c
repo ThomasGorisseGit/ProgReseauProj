@@ -17,37 +17,54 @@
 #define COLOR_BLUE "\033[34m"
 
 // Affiche le guide d'utilisation des commandes
-void afficher_guide() {
+void afficher_guide()
+{
     printf(COLOR_YELLOW "Commandes disponibles:\n" COLOR_RESET);
     printf(COLOR_GREEN "/listeJoueurs" COLOR_RESET " - Liste les joueurs dans le lobby\n");
     printf(COLOR_GREEN "/defier <nom>" COLOR_RESET " - Défi un joueur spécifié par son nom\n");
 }
 
 // Fonction pour traiter les messages reçus du serveur
-void handle_message(char *message, int *sockfd) {
+void handle_message(char *message, int *sockfd)
+{
     char command[50], destinataire[50], body[150];
-    if (verifierFormatMessage(message, command, destinataire, body)) {
-        if (strcmp(command, "joining") == 0) {
+    if (verifierFormatMessage(message, command, destinataire, body))
+    {
+        if (strcmp(command, "joining") == 0)
+        {
             printf(COLOR_GREEN "%s\n" COLOR_RESET, body);
-        } else if (strcmp(command, "displayLobby") == 0) {
+        }
+        else if (strcmp(command, "displayLobby") == 0)
+        {
             printf(COLOR_BLUE "%s\n" COLOR_RESET, body);
-        } else if (strcmp(command, "defier") == 0) {
-            printf(COLOR_RED "Défi reçu de %s\n" COLOR_RESET, destinataire);
-        } else if (strcmp(command, "listeJoueurs") == 0) {
+        }
+        else if (strcmp(command, "defier") == 0)
+        {
+            printf(COLOR_RED "Défi reçu de %s : %s\n" COLOR_RESET, destinataire, body);
+            // TODO renvoyer la réponse et set l'état des joueurs en fonction de ça.
+        }
+        else if (strcmp(command, "listeJoueurs") == 0)
+        {
             printf(COLOR_GREEN "Liste des joueurs disponibles :\n%s\n" COLOR_RESET, body);
-        } else {
+        }
+        else
+        {
             printf(COLOR_YELLOW "Commande inconnue du serveur\n" COLOR_RESET);
         }
-    } else {
+    }
+    else
+    {
         printf(COLOR_RED "Message du serveur invalide : %s\n" COLOR_RESET, message);
     }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     int sockfd;
     struct sockaddr_in serv_addr;
 
-    if (argc != 3) {
+    if (argc != 3)
+    {
         printf(COLOR_RED "usage: socket_client server port\n" COLOR_RESET);
         exit(0);
     }
@@ -60,12 +77,14 @@ int main(int argc, char **argv) {
     serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
     serv_addr.sin_port = htons(atoi(argv[2]));
 
-    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
         perror("Socket error");
         exit(0);
     }
 
-    if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+    if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
         perror("Connect error");
         exit(0);
     }
@@ -85,7 +104,8 @@ int main(int argc, char **argv) {
     // Affiche le guide à l'utilisateur
     afficher_guide();
 
-    while (1) {
+    while (1)
+    {
         FD_ZERO(&readfds);
         FD_SET(sockfd, &readfds);
         FD_SET(STDIN_FILENO, &readfds);
@@ -93,40 +113,55 @@ int main(int argc, char **argv) {
         int max_fd = sockfd > STDIN_FILENO ? sockfd : STDIN_FILENO;
         int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
 
-        if (activity < 0) {
+        if (activity < 0)
+        {
             perror("select error");
             break;
         }
 
         // Lecture des messages du serveur
-        if (FD_ISSET(sockfd, &readfds)) {
+        if (FD_ISSET(sockfd, &readfds))
+        {
             int n = read(sockfd, buffer, sizeof(buffer) - 1);
-            if (n > 0) {
+            if (n > 0)
+            {
                 buffer[n] = '\0';
                 handle_message(buffer, &sockfd);
-            } else if (n == 0) {
+            }
+            else if (n == 0)
+            {
                 printf(COLOR_RED "Serveur déconnecté.\n" COLOR_RESET);
                 break;
-            } else {
+            }
+            else
+            {
                 perror("Erreur de lecture depuis le serveur");
             }
         }
 
         // Lecture des commandes utilisateur
-        if (FD_ISSET(STDIN_FILENO, &readfds)) {
+        if (FD_ISSET(STDIN_FILENO, &readfds))
+        {
             char user_input[256];
             fgets(user_input, sizeof(user_input), stdin);
             user_input[strcspn(user_input, "\n")] = 0; // Supprime le saut de ligne
 
             // Vérifie la commande et l'envoie au serveur
-            if (strcmp(user_input, "/listeJoueurs") == 0) {
+            if (strcmp(user_input, "/listeJoueurs") == 0)
+            {
                 ecrire(&sockfd, "listeJoueurs", "server", "");
-            } else if (strncmp(user_input, "/defier ", 7) == 0) {
+            }
+            else if (strncmp(user_input, "/defier ", 7) == 0)
+            {
                 char *target = user_input + 8; // Extrait le nom cible
                 ecrire(&sockfd, "defier", "server", target);
-            } else if (strcmp(user_input, "/help") == 0) {
+            }
+            else if (strcmp(user_input, "/help") == 0)
+            {
                 afficher_guide();
-            } else {
+            }
+            else
+            {
                 printf(COLOR_YELLOW "Commande inconnue. Utilisez /help pour voir les commandes disponibles.\n" COLOR_RESET);
             }
         }

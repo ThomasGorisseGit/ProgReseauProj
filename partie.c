@@ -6,17 +6,19 @@
 
 // Affiche les joueurs en LOBBY
 
-char* toStringJoueursDispo(Lobby *lobby)
+char *toStringJoueursDispo(Lobby *lobby)
 {
     char *message = malloc(MAX_MESSAGE_SIZE * sizeof(char));
     strcpy(message, "Pseudo\t\t | \tStatus\n");
     for (int i = 0; i < lobby->nbJoueurs; i++)
-    {   Joueur *joueur = lobby->joueurs[i];
-        if(joueur->status ==LOBBY) {
-        message = strcat(message, lobby->joueurs[i]->nom);
-        message = strcat(message, "\t\t | \t");
-        message = strcat(message, lobby->joueurs[i]->status == LOBBY ? "Lobby" : "En partie");
-        message = strcat(message, "\n");
+    {
+        Joueur *joueur = lobby->joueurs[i];
+        if (joueur->status == LOBBY)
+        {
+            message = strcat(message, lobby->joueurs[i]->nom);
+            message = strcat(message, "\t\t | \t");
+            message = strcat(message, lobby->joueurs[i]->status == LOBBY ? "Lobby" : "En partie");
+            message = strcat(message, "\n");
         }
     }
     return message;
@@ -24,16 +26,22 @@ char* toStringJoueursDispo(Lobby *lobby)
 
 #include <string.h>
 
-Joueur * defierJoueur(Lobby *lobby, char *pseudo) {
-   for (int i = 0; i < lobby->nbJoueurs; i++) {
+Joueur *defierJoueur(Lobby *lobby, char *pseudo)
+{
+    for (int i = 0; i < lobby->nbJoueurs; i++)
+    {
         Joueur *joueur = lobby->joueurs[i];
 
         // Vérifie si le pseudo correspond
-        if (strcmp(joueur->nom, pseudo) == 0) {
+        if (strcmp(joueur->nom, pseudo) == 0)
+        {
             // Vérifie si le joueur est dans le lobby et disponible
-            if (joueur->status == LOBBY) {
+            if (joueur->status == LOBBY)
+            {
                 return joueur; // Retourne le pointeur vers le joueur disponible
-            } else {
+            }
+            else
+            {
                 return NULL; // Le joueur est en partie
             }
         }
@@ -41,9 +49,9 @@ Joueur * defierJoueur(Lobby *lobby, char *pseudo) {
     return NULL;
 }
 
-
 // Initialise la partie Awale
-int initialiserPartie(Jeu *jeu) {
+int initialiserPartie(Jeu *jeu)
+{
     printf("Initialisation de la partie...\n");
     initialiserPlateau(jeu); // Utilisation de la fonction existante pour initialiser le plateau
     afficherPlateau(jeu);    // Affichage initial du plateau

@@ -5,10 +5,10 @@
 #include "server.h"
 
 // Affiche la liste des joueurs disponibles dans le lobby
-char* toStringJoueursDispo(Lobby *lobby);
+char *toStringJoueursDispo(Lobby *lobby);
 
 // Envoie un défi à un joueur spécifique par son nom
-Joueur* defierJoueur(Lobby *lobby, char *pseudo);
+Joueur *defierJoueur(Lobby *lobby, char *pseudo);
 
 // Initialise la partie Awale
 int initialiserPartie(Jeu *jeu);

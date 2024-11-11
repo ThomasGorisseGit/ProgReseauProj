@@ -14,7 +14,6 @@
 #include "server.h"
 #include "partie.h"
 
-
 char *toStringLobby(Lobby *lobby)
 {
     int totalLength = strlen("Liste des joueurs connectés :\n");
@@ -117,7 +116,7 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                 {
                     strcpy(joueur->nom, body);
                     printf("Nom du joueur %d mis à jour : %s\n", i, joueur->nom);
-                    
+
                     char join_msg[MAX_MESSAGE_SIZE];
                     snprintf(join_msg, sizeof(join_msg), "/joining #server Un nouveau joueur a rejoint le lobby : %s", joueur->nom);
                     envoyerATousDansLobby(lobby, join_msg);
@@ -135,21 +134,28 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                 }
                 else if (strcmp(command, "defier") == 0)
                 {
-                    printf("Le corps du message est : %s", body);
+                    printf("Le corps du message est : %s\n", body);
                     Joueur *defie = defierJoueur(lobby, body);
-                    if (defie != NULL)
+                    if (strcmp(joueur->nom, body) == 0)
                     {
                         char defier_msg[MAX_MESSAGE_SIZE];
-                        snprintf(defier_msg, sizeof(defier_msg), "/defier #server Le joueur %s veut vous défier. Pour accepter taper 1, pour refuser taper 0.", joueur->nom);
+                        snprintf(defier_msg, sizeof(defier_msg), "/defier #%s Vous ne pouvez pas vous défier vous même.", joueur->nom);
+                        envoyer(joueur, defier_msg);
+                    }
+                    else if (defie != NULL)
+                    {
+                        char defier_msg[MAX_MESSAGE_SIZE];
+                        snprintf(defier_msg, sizeof(defier_msg), "/defier #%s Le joueur %s veut vous défier. Pour accepter tapez 1, pour refuser tapez 0.", defie->nom, joueur->nom);
                         envoyer(defie, defier_msg);
                     }
                     else
                     {
                         char error_msg[MAX_MESSAGE_SIZE];
-                        snprintf(error_msg, sizeof(error_msg), "/error #server Le joueur %s n'est pas disponible pour un défi.", destinataire);
+                        snprintf(error_msg, sizeof(error_msg), "/error #server Le joueur %s n'est pas disponible pour un défi.", body);
                         envoyer(joueur, error_msg);
                     }
                 }
+
                 else
                 {
                     printf("Commande inconnue reçue: %s\n", command);
@@ -162,7 +168,6 @@ void handle_message(Lobby *lobby, fd_set *readfds)
         }
     }
 }
-
 
 int main(int argc, char **argv)
 {
