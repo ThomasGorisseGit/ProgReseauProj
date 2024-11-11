@@ -22,6 +22,26 @@ char* toStringJoueursDispo(Lobby *lobby)
     return message;
 }
 
+#include <string.h>
+
+Joueur * defierJoueur(Lobby *lobby, char *pseudo) {
+   for (int i = 0; i < lobby->nbJoueurs; i++) {
+        Joueur *joueur = lobby->joueurs[i];
+
+        // Vérifie si le pseudo correspond
+        if (strcmp(joueur->nom, pseudo) == 0) {
+            // Vérifie si le joueur est dans le lobby et disponible
+            if (joueur->status == LOBBY) {
+                return joueur; // Retourne le pointeur vers le joueur disponible
+            } else {
+                return NULL; // Le joueur est en partie
+            }
+        }
+    }
+    return NULL;
+}
+
+
 // Initialise la partie Awale
 int initialiserPartie(Jeu *jeu) {
     printf("Initialisation de la partie...\n");

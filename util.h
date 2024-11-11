@@ -15,6 +15,6 @@
 #define MAX_BODY_SIZE 150
 
 int verifierFormatMessage(char *message, char *command, char *destinataire, char *body);
-void ecrire(int *socket, char *command, char *destinataire);
+void ecrire(int *socket, char *command, char *destinataire, char* body);
 
 #endif

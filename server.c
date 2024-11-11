@@ -133,6 +133,23 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                     snprintf(liste_message, sizeof(liste_message), "/listeJoueurs #server %s", toStringJoueursDispo(lobby));
                     envoyer(joueur, liste_message);
                 }
+                else if (strcmp(command, "defier") == 0)
+                {
+                    printf("Le corps du message est : %s", body);
+                    Joueur *defie = defierJoueur(lobby, body);
+                    if (defie != NULL)
+                    {
+                        char defier_msg[MAX_MESSAGE_SIZE];
+                        snprintf(defier_msg, sizeof(defier_msg), "/defier #server Le joueur %s veut vous défier. Pour accepter taper 1, pour refuser taper 0.", joueur->nom);
+                        envoyer(defie, defier_msg);
+                    }
+                    else
+                    {
+                        char error_msg[MAX_MESSAGE_SIZE];
+                        snprintf(error_msg, sizeof(error_msg), "/error #server Le joueur %s n'est pas disponible pour un défi.", destinataire);
+                        envoyer(joueur, error_msg);
+                    }
+                }
                 else
                 {
                     printf("Commande inconnue reçue: %s\n", command);

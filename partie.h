@@ -8,7 +8,7 @@
 char* toStringJoueursDispo(Lobby *lobby);
 
 // Envoie un défi à un joueur spécifique par son nom
-int defierJoueur(Lobby *lobby, char *nomJoueur, Joueur *joueurSource);
+Joueur* defierJoueur(Lobby *lobby, char *pseudo);
 
 // Initialise la partie Awale
 int initialiserPartie(Jeu *jeu);

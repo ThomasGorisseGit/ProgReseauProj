@@ -37,18 +37,15 @@ int verifierFormatMessage(char *message, char *command, char *destinataire, char
     return 1; // Succès
 }
 
-void ecrire(int *socket, char *command, char *destinataire)
+void ecrire(int *socket, char *command, char *destinataire, char *body)
 {
-    char body[MAX_BODY_SIZE];
     char message[MAX_BODY_SIZE + MAX_COMMAND_SIZE + MAX_DESTINATAIRE_SIZE + 3];
     int n;
 
-    bzero(body, MAX_BODY_SIZE);
-    fgets(body, MAX_BODY_SIZE - 1, stdin);
-
+    // Formatte le message avec le command, destinataire et body
     sprintf(message, "/%s #%s %s", command, destinataire, body);
     n = write(*socket, message, strlen(message));
-    printf("Message envoyé:%s", message);
+    printf("Message envoyé:%s\n", message);
     if (n < 0)
     {
         perror("ERROR writing to socket");
