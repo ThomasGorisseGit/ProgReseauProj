@@ -19,6 +19,9 @@ void handle_message(char *message, int *sockfd)
 
   if (verifierFormatMessage(message, command, destinataire, body))
   {
+    // SI nom
+    // SI lobby
+    // SI défi
     printf("%s\n", body);
     ecrire(sockfd, command, destinataire);
   }

@@ -4,33 +4,39 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-
-typedef struct Joueur {
-    char* nom;
+typedef enum EStatus
+{
+    LOBBY,
+    PARTIE,
+    DEFI
+} Status;
+typedef struct Joueur
+{
+    char *nom;
     int score;
-    int* socket;
-    char* buffer;
+    int *socket;
+    Status *status;
 } Joueur;
 
-typedef struct Case {
+typedef struct Case
+{
     int nbGraines;
-    Joueur* proprietaire;
+    Joueur *proprietaire;
 } Case;
 
-
-typedef struct Jeu {
-    Case* plateau;
-    Joueur* joueur1;
-    Joueur* joueur2;
-    Joueur* vainqueur;
-    Joueur* current;
+typedef struct Jeu
+{
+    Case *plateau;
+    Joueur *joueur1;
+    Joueur *joueur2;
+    Joueur *vainqueur;
+    Joueur *current;
 } Jeu;
 
-void initialiserPlateau(Jeu* jeu);
-void afficherPlateau(Jeu* jeu);
-int verifierCasDarret(Jeu* jeu);
-void calculerScore(Jeu* jeu, int caseFin);
-int jouerCoup(Jeu* jeu, int caseDepart);
-
+void initialiserPlateau(Jeu *jeu);
+void afficherPlateau(Jeu *jeu);
+int verifierCasDarret(Jeu *jeu);
+void calculerScore(Jeu *jeu, int caseFin);
+int jouerCoup(Jeu *jeu, int caseDepart);
 
 #endif // AWALE_H

@@ -10,15 +10,11 @@
 #include <assert.h>
 #include "awale.h"
 #include "util.h"
-
+#include "communication.h"
+#include "server.h"
 #define MAX_NAME_SIZE 48
-#define MAX_MESSAGE_SIZE 256
+#define MAX_MESSAGE_SIZE 1024
 #define MAX_PLAYER 10
-typedef struct
-{
-    Joueur **joueurs;
-    int nbJoueurs;
-} Lobby;
 
 char *toStringLobby(Lobby *lobby)
 {
@@ -28,26 +24,17 @@ char *toStringLobby(Lobby *lobby)
         totalLength += strlen(lobby->joueurs[i]->nom) + 1; // +1 pour le saut de ligne
     }
     char *message = malloc(totalLength * sizeof(char));
-    strcpy(message, "Liste des joueurs connectés :\n");
+    strcpy(message, "Pseudo\t\t | \tStatus\n");
     for (int i = 0; i < lobby->nbJoueurs; i++)
     {
         message = strcat(message, lobby->joueurs[i]->nom);
+        message = strcat(message, "\t\t | \t");
+        message = strcat(message, lobby->joueurs[i]->status == LOBBY ? "Lobby" : "En partie");
         message = strcat(message, "\n");
     }
     return message;
 }
 
-int envoyer(Joueur *joueur, char *message)
-{
-    int n;
-    n = write(*joueur->socket, message, strlen(message));
-    if (n < 0)
-    {
-        perror("ERROR writing to socket");
-        exit(1);
-    }
-    return n;
-}
 void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
 {
     struct sockaddr_in cli_addr;
@@ -67,6 +54,10 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
     Joueur *joueur = malloc(sizeof(Joueur));
     joueur->socket = newsockfd;
     joueur->nom = malloc(MAX_NAME_SIZE * sizeof(char));
+    joueur->status = malloc(sizeof(Status));
+
+    strcpy(joueur->nom, "Anonyme");
+    joueur->status = LOBBY;
 
     // Ajouter le nouveau joueur au lobby
     lobby->joueurs[lobby->nbJoueurs] = joueur;
@@ -123,9 +114,10 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                     char message[MAX_MESSAGE_SIZE];
                     strcpy(message, "/displayLobby #server ");
                     strcat(message, toStringLobby(lobby));
-                    envoyer(joueur, message);
+                    envoyerATousDansLobby(lobby, message);
                     printf("Envoie de %s", message);
                 }
+                // LA
             }
         }
     }
