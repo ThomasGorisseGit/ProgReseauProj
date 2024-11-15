@@ -50,14 +50,15 @@ Joueur *defierJoueur(Lobby *lobby, char *pseudo)
 }
 
 // Initialise la partie Awale
-int initialiserPartie(Jeu *jeu)
+char *initialiserPartie(Jeu *jeu)
 {
     printf("Initialisation de la partie...\n");
     initialiserPlateau(jeu); // Utilisation de la fonction existante pour initialiser le plateau
-    afficherPlateau(jeu);    // Affichage initial du plateau
+    printf("Plateau initialisé\n\n");
+    char *plateau = afficherPlateau(jeu);
 
     printf("La partie est prête à commencer.\n");
-    return 1; // Retourne 1 pour indiquer que l'initialisation est réussie
+    return plateau; // Retourne 1 pour indiquer que l'initialisation est réussie
 }
 
 // Fonction pour trouver un joueur par son nom dans le lobby

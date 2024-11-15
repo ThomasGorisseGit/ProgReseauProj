@@ -11,7 +11,7 @@ char *toStringJoueursDispo(Lobby *lobby);
 Joueur *defierJoueur(Lobby *lobby, char *pseudo);
 
 // Initialise la partie Awale
-int initialiserPartie(Jeu *jeu);
+char *initialiserPartie(Jeu *jeu);
 
 Joueur *trouverJoueurParNom(Lobby *lobby, const char *nom);
 

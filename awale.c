@@ -1,72 +1,95 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include "awale.h"
 
 void initialiserPlateau(Jeu *jeu)
 {
+    if (jeu->plateau == NULL)
+    {
+        printf("Plateau pas encore initialisé.");
+        Case *plateau = malloc(sizeof(plateau));
+        jeu->plateau = plateau;
+    }
+
     printf("Init du plateau\n");
+
+    // Initialiser les graines et les propriétaires des cases
     for (int i = 0; i < 12; i++)
     {
-        jeu->plateau[i].nbGraines = 4;
+        jeu->plateau[i].nbGraines = 4; // 4 graines par case
     }
     for (int i = 0; i < 6; i++)
     {
-        jeu->plateau[i].proprietaire = jeu->joueur1;
+        jeu->plateau[i].proprietaire = jeu->joueur1; // Cases 0-5 appartiennent à joueur1
     }
     for (int i = 6; i < 12; i++)
     {
-        jeu->plateau[i].proprietaire = jeu->joueur2;
+        jeu->plateau[i].proprietaire = jeu->joueur2; // Cases 6-11 appartiennent à joueur2
     }
+
+    // Initialiser les scores des joueurs
     jeu->joueur1->score = 0;
     jeu->joueur2->score = 0;
 }
 
-void afficherPlateau(Jeu *jeu)
+char *afficherPlateau(Jeu *jeu)
 {
-    printf("Joueur 1 : %s\n", jeu->joueur1->nom);
-    printf("Score : %d\n", jeu->joueur1->score);
-    printf("\n");
-    printf("Joueur 2 : %s\n", jeu->joueur2->nom);
-    printf("Score : %d\n", jeu->joueur2->score);
-    printf("| ");
+    // Allocate memory for the board display
+    char *plateauStr = malloc(MAX_MESSAGE_SIZE * sizeof(char));
+    if (plateauStr == NULL)
+    {
+        perror("Erreur d'allocation mémoire pour le plateau");
+        exit(1);
+    }
+    plateauStr[0] = '\0'; // Initialize the string
+
+    // Add player 1 information
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), "Joueur 1 : %s\nScore : %d\n\n", jeu->joueur1->nom, jeu->joueur1->score);
+    strcat(plateauStr, buffer);
+
+    // Add player 2 information
+    snprintf(buffer, sizeof(buffer), "Joueur 2 : %s\nScore : %d\n\n", jeu->joueur2->nom, jeu->joueur2->score);
+    strcat(plateauStr, buffer);
+
+    // Upper row indices
     for (int i = 0; i < 6; i++)
     {
-        printf(" %d | ", i);
+        snprintf(buffer, sizeof(buffer), "  %d  ", i);
+        strcat(plateauStr, buffer);
     }
-    printf("\n");
-    printf("| ");
+    strcat(plateauStr, "\n");
 
+    // Upper row seeds
     for (int i = 0; i < 6; i++)
     {
-        printf(" %d | ", jeu->plateau[i].nbGraines);
+        snprintf(buffer, sizeof(buffer), "  %d  ", jeu->plateau[i].nbGraines);
+        strcat(plateauStr, buffer);
     }
-    printf("\n");
-    for (int i = 0; i < 9; i++)
-    {
-        printf("_____");
-    }
-    printf("\n");
-    printf("\n");
-    printf("| ");
+    strcat(plateauStr, "\n");
 
+    // Separator line
+    strcat(plateauStr, "-------------------------------\n");
+
+    // Lower row indices
     for (int i = 11; i > 5; i--)
     {
-        printf(" %d | ", i);
+        snprintf(buffer, sizeof(buffer), "  %d  ", i);
+        strcat(plateauStr, buffer);
     }
+    strcat(plateauStr, "\n");
 
-    printf("\n");
-    printf("| ");
-    for (int i = 11; i > 9; i--)
+    // Lower row seeds
+    for (int i = 11; i > 5; i--)
     {
-        printf(" %d  | ", jeu->plateau[i].nbGraines);
+        snprintf(buffer, sizeof(buffer), "  %d  ", jeu->plateau[i].nbGraines);
+        strcat(plateauStr, buffer);
     }
-    for (int i = 9; i > 5; i--)
-    {
-        printf(" %d | ", jeu->plateau[i].nbGraines);
-    }
-    printf("\n");
-    printf("\n");
+    strcat(plateauStr, "\n");
+
+    return plateauStr;
 }
 
 int verifierCasDarret(Jeu *jeu)

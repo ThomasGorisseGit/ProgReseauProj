@@ -170,7 +170,31 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                         envoyer(demandeur, msg);
                         demandeur->status = PARTIE;
                         joueur->status = PARTIE;
-                        // Initialiser la partie si nécessaire
+                        // Initialiser la partie
+                        Jeu *jeu = malloc(sizeof(Jeu));
+                        // vérification de l'existance du jeu
+                        if (jeu == NULL)
+                        {
+                            perror("Erreur d'allocation mémoire pour le jeu");
+                            exit(1);
+                        }
+                        jeu->joueur1 = demandeur;
+                        jeu->joueur2 = joueur;
+                        jeu->current = demandeur;
+                        jeu->joueur1 = demandeur;
+                        jeu->joueur2 = joueur;
+
+                        if (jeu->joueur1 == NULL || jeu->joueur2 == NULL || jeu->current == NULL)
+                        {
+                            fprintf(stderr, "Les joueurs ne sont pas correctement initialisés.\n");
+                            free(jeu); // Libération de la mémoire pour éviter une fuite
+                            exit(1);
+                        }
+                        printf("Joueur 1: %s, Joueur 2: %s\n", jeu->joueur1->nom, jeu->joueur2->nom);
+                        char *plateau_msg = malloc(sizeof(char *));
+                        plateau_msg = initialiserPartie(jeu);
+                        snprintf(plateau_msg, sizeof(plateau_msg), "/plateau #server #%s Plateau initial :\n %s\n", demandeur, plateau_msg);
+                        envoyer(demandeur, plateau_msg);
                     }
                 }
 

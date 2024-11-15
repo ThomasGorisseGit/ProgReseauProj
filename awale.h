@@ -1,5 +1,6 @@
 #ifndef AWALE_H
 #define AWALE_H
+#define MAX_MESSAGE_SIZE 1024
 
 #include <stdio.h>
 #include <string.h>
@@ -34,7 +35,7 @@ typedef struct Jeu
 } Jeu;
 
 void initialiserPlateau(Jeu *jeu);
-void afficherPlateau(Jeu *jeu);
+char *afficherPlateau(Jeu *jeu);
 int verifierCasDarret(Jeu *jeu);
 void calculerScore(Jeu *jeu, int caseFin);
 int jouerCoup(Jeu *jeu, int caseDepart);
