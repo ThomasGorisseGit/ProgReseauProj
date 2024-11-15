@@ -64,8 +64,6 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
     FD_SET(*newsockfd, readfds);
     if (*newsockfd > *max_fd)
         *max_fd = *newsockfd;
-
-    envoyer(joueur, "/name #server #serveur Entrez votre nom : ");
 }
 
 void handle_message(Lobby *lobby, fd_set *readfds)
@@ -109,9 +107,9 @@ void handle_message(Lobby *lobby, fd_set *readfds)
 
                     // Envoi du message "joining" proprement formaté
                     char join_msg[MAX_MESSAGE_SIZE];
-                    snprintf(join_msg, sizeof(join_msg), "/joining #server #%s Un nouveau joueur a rejoint le lobby : %s", joueur->nom, joueur->nom);
+                    snprintf(join_msg, sizeof(join_msg), "/joining #server #%s Un nouveau joueur a rejoint le lobby : %s\n", joueur->nom, joueur->nom);
                     envoyerATousDansLobby(lobby, join_msg);
-
+                    usleep(2000);
                     char lobby_msg[MAX_MESSAGE_SIZE];
                     snprintf(lobby_msg, sizeof(lobby_msg), "/displayLobby #server #%s %s", joueur->nom, toStringLobby(lobby));
                     envoyer(joueur, lobby_msg);
@@ -130,7 +128,7 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                     if (strcmp(joueur->nom, destinataire) == 0)
                     {
                         char defier_msg[MAX_MESSAGE_SIZE];
-                        snprintf(defier_msg, sizeof(defier_msg), "/defier #%s #%s Vous ne pouvez pas vous défier vous-même.", joueur->nom, joueur->nom);
+                        snprintf(defier_msg, sizeof(defier_msg), "/message #%s #%s Vous ne pouvez pas vous défier vous-même.", joueur->nom, joueur->nom);
                         envoyer(joueur, defier_msg);
                     }
                     else if (defie != NULL)

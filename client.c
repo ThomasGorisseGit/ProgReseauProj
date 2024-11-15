@@ -41,7 +41,6 @@ void handle_message(char *message, int *sockfd)
             printf(COLOR_RED "Défi reçu de %s : %s\n" COLOR_RESET, expediteur, body);
             // Demander une réponse de l'utilisateur
             char response[10];
-            printf("Accepter le défi ? (1 pour oui, 0 pour non) : ");
             fgets(response, sizeof(response), stdin);
             response[strcspn(response, "\n")] = 0;
 
@@ -54,14 +53,24 @@ void handle_message(char *message, int *sockfd)
                 ecrire(sockfd, "declinerDefi", expediteur, "Le défi est refusé.", destinataire);
             }
         }
+        else if (strcmp(command, "listeJoueurs") == 0)
+        {
+            printf(COLOR_BLUE "La liste des joueurs disponibles est la suivante : %s\n" COLOR_RESET, body);
+        }
+        else if (strcmp(command, "message") == 0)
+        {
+            printf(COLOR_YELLOW "%s\n" COLOR_RESET, body);
+        }
         else
         {
-            printf(COLOR_YELLOW "Commande inconnue du serveur\n" COLOR_RESET);
+            printf(COLOR_RED "Commande inconnue du serveur\n" COLOR_RESET);
+            printf("%s\n", message);
         }
     }
     else
     {
         printf(COLOR_RED "Message du serveur invalide : %s\n" COLOR_RESET, message);
+        printf("%s\n", message);
     }
 }
 
