@@ -245,12 +245,9 @@ int main(int argc, char **argv)
     int sockfd;
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
-
     fd_set readfds;
     int max_fd;
     int i, n;
-    Joueur *joueurs[MAX_PLAYER];
-    int nb_joueurs = 0;
     if (argc != 2)
     {
         printf("usage: socket_server port\n");
@@ -276,7 +273,7 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    listen(sockfd, 5);
+    listen(sockfd, MAX_PLAYER);
     printf("En attente de connexions\n");
 
     Lobby *lobby = malloc(sizeof(Lobby));
