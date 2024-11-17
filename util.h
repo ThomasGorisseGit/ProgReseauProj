@@ -12,9 +12,8 @@
 
 #define MAX_COMMAND_SIZE 50
 #define MAX_DESTINATAIRE_SIZE 50
-#define MAX_BODY_SIZE 1024
+#define MAX_BODY_SIZE 2048
 
-int verifierFormatMessage(char *message, char *command, char *destinataire, char *body, char *expediteur);
 void ecrire(int *socket, char *command, char *destinataire, char *body, char *expediteur);
-
+int verifierFormatMessage(char *message, char *command, char *expediteur, char *destinataire, char *body);
 #endif
