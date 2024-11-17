@@ -22,6 +22,7 @@ void afficher_guide()
     printf(COLOR_YELLOW "Commandes disponibles:\n" COLOR_RESET);
     printf(COLOR_GREEN "/listeJoueurs" COLOR_RESET " - Liste les joueurs dans le lobby\n");
     printf(COLOR_GREEN "/defier <nom>" COLOR_RESET " - Défi un joueur spécifié par son nom\n");
+    printf(COLOR_GREEN "/message <nom> : <message>" COLOR_RESET " - Envoyer un message à un joueur\n");
 }
 void handle_message(char *message, int *sockfd)
 {
@@ -59,7 +60,7 @@ void handle_message(char *message, int *sockfd)
         }
         else if (strcmp(command, "message") == 0)
         {
-            printf(COLOR_YELLOW "%s\n" COLOR_RESET, body);
+            printf(COLOR_RED "Message reçu de %s : %s\n" COLOR_RESET, expediteur, body);
         }
         else
         {
@@ -172,6 +173,37 @@ int main(int argc, char **argv)
             else if (strcmp(user_input, "/help") == 0)
             {
                 afficher_guide();
+            }
+            else if (strncmp(user_input, "/message ", 9) == 0) // Vérifie si la commande commence par "/message"
+            {
+                char *input = user_input + 9;         // Extrait tout après "/message "
+                char *colon_pos = strchr(input, ':'); // Cherche le premier ':'
+
+                if (colon_pos != NULL)
+                {
+                    *colon_pos = '\0';             // Remplace ':' par '\0' pour séparer le nom et le message
+                    char *target = input;          // Le nom est avant le ':'
+                    char *message = colon_pos + 1; // Le message est après le ':'
+
+                    // Supprime les espaces superflus au début du message
+                    while (isspace((unsigned char)*message))
+                    {
+                        message++;
+                    }
+
+                    if (strlen(target) > 0 && strlen(message) > 0)
+                    {
+                        ecrire(&sockfd, "message", target, message, nom);
+                    }
+                    else
+                    {
+                        printf(COLOR_YELLOW "Erreur : La commande /message nécessite un nom et un message.\n" COLOR_RESET);
+                    }
+                }
+                else
+                {
+                    printf(COLOR_YELLOW "Erreur : La commande /message nécessite un ':' pour séparer le nom et le message.\n" COLOR_RESET);
+                }
             }
             else
             {
