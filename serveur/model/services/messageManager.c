@@ -1,5 +1,4 @@
 #include "messageManager.h"
-
 int verifierFormatMessage(char *message, char *command, char *expediteur, char *destinataire, char *body)
 {
     size_t len = strlen(message);
@@ -41,41 +40,4 @@ int verifierFormatMessage(char *message, char *command, char *expediteur, char *
     }
 
     return 1;
-}
-
-int check_if_message(Lobby *lobby, fd_set *readfds)
-{
-    for (int i = 0; i < lobby->nbJoueurs; i++)
-    {
-        Joueur *joueur = lobby->joueurs[i];
-        char message[MAX_MESSAGE_SIZE];
-        int n;
-
-        if (FD_ISSET(*joueur->socket, readfds))
-        {
-            n = read(*joueur->socket, message, MAX_MESSAGE_SIZE);
-            if (n < 0)
-            {
-                perror("Erreur de lecture du socket");
-                continue;
-            }
-            if (n == 0)
-            {
-                printf("Client déconnecté\n");
-                close(*joueur->socket);
-                FD_CLR(*joueur->socket, readfds);
-                free(joueur->nom);
-                free(joueur);
-                lobby->joueurs[i] = lobby->joueurs[--lobby->nbJoueurs];
-                i--;
-                continue;
-            }
-
-            message[n] = '\0';
-            printf("Message reçu de %s: %s\n", joueur->nom, message);
-            message_handler(joueur, message);
-        }
-    }
-
-    return 0;
 }

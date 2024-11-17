@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <sys/select.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "../donnees/lobby.h"
 #include "../donnees/constants.h"
 

@@ -1,6 +1,8 @@
 #ifndef ECHANGE_H
 #define ECHANGE_H
 
+#include <stdlib.h>
+#include <unistd.h>
 #include "../model/donnees/constants.h"
 #include "../model/donnees/lobby.h"
 
@@ -13,6 +15,11 @@ void envoyer_gagnant(Jeu *jeu);
 void envoyer_egalite(Jeu *jeu);
 
 void envoyer_plateau(Jeu *jeu);
-int envoyer_a_tous(Lobby *lobby, char *message);
+void envoyer_a_tous(Lobby *lobby, char *message);
+void envoyer_liste_joueurs(Lobby *lobby, Joueur *joueur);
+void envoyer_defi(Joueur *joueur, Joueur *defie);
+void envoyer_rejoindre(Joueur *joueur, Lobby *lobby);
 
-#endif
+void envoyer_decliner_defi(Joueur *joueur, Joueur *demandeur);
+void envoyer_accepter_defi(Joueur *joueur, Joueur *demandeur);
+#endif // ECHANGE_H

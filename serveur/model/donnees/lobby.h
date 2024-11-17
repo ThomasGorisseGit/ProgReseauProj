@@ -1,3 +1,6 @@
+#ifndef LOBBY_H
+#define LOBBY_H
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -40,3 +43,5 @@ typedef struct
     Jeu **jeux;
     int nbJeux;
 } Lobby;
+
+#endif

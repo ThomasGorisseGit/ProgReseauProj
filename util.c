@@ -6,7 +6,7 @@ void ecrire(int *socket, char *command, char *destinataire, char *body, char *ex
     int n;
 
     // Construire le message avec l'expéditeur inclus
-    sprintf(message, "/%s #%s #%s %s", command, destinataire, expediteur, body);
+    sprintf(message, "/%s #%s #%s %s", command, expediteur, destinataire, body);
     n = write(*socket, message, strlen(message));
     printf("Message envoyé: %s\n", message);
     if (n < 0)

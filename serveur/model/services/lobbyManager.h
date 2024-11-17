@@ -1,5 +1,5 @@
-#ifndef LOBBY_H
-#define LOBBY_H
+#ifndef LOBBY_MANAGER_H
+#define LOBBY_MANAGER_H
 #include <stdio.h>
 #include <string.h>
 #include <sys/select.h>
@@ -8,6 +8,8 @@
 
 #include "../donnees/lobby.h"
 #include "../donnees/constants.h"
+
+#include "../../vue/echange.h"
 
 Lobby *initialiserLobby();
 void fin_partie(Jeu *jeu);
@@ -18,8 +20,8 @@ Joueur *defier_joueur(Lobby *lobby, char *pseudo);
 
 int commande_listeJoueurs(Joueur *joueur, Lobby *lobby);
 int commande_nom(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE]);
-int commande_message(char destinataire[MAX_DESTINATAIRE_SIZE], Joueur *expediteur, Lobby *lobby, char body[MAX_BODY_SIZE]);
+int commande_message(char destinataire[MAX_DESTINATAIRE_SIZE], char expediteur[MAX_DESTINATAIRE_SIZE], Lobby *lobby, char body[MAX_BODY_SIZE]);
 int commande_defier(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINATAIRE_SIZE]);
 int commande_declinerDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINATAIRE_SIZE]);
 
-#endif // LOBBY_H
+#endif // LOBBY_MANAGER_H

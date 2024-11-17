@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include "util.h"
+#include <sys/select.h>
 
 // Définition des couleurs pour terminal
 #define COLOR_RESET "\033[0m"
@@ -27,11 +28,11 @@ void afficher_guide()
 void handle_message(char *message, int *sockfd)
 {
     char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE], expediteur[MAX_DESTINATAIRE_SIZE];
-    if (verifierFormatMessage(message, command, destinataire, body, expediteur))
+    if (verifierFormatMessage(message, command, expediteur, destinataire, body))
     {
         if (strcmp(command, "joining") == 0)
         {
-            printf(COLOR_GREEN "%s\n" COLOR_RESET, body);
+            printf(COLOR_YELLOW "%s\n" COLOR_RESET, body);
         }
         else if (strcmp(command, "displayLobby") == 0)
         {
@@ -113,7 +114,7 @@ int main(int argc, char **argv)
     nom[strcspn(nom, "\n")] = '\0'; // Supprimer le saut de ligne
 
     // Envoyer la commande de nom au serveur avec l’expéditeur
-    ecrire(&sockfd, "name", "server", nom, nom);
+    ecrire(&sockfd, "nom", "server", nom, nom);
 
     fd_set readfds;
     char buffer[1024];

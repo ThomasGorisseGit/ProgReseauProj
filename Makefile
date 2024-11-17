@@ -1,58 +1,20 @@
-# Variables
 CC = gcc
-CFLAGS = -Wall -Wextra -I./
-SRC_DIR = serveur
-OBJ_DIR = ./build
-BIN_DIR = ./bin
-CLIENT_EXEC = $(BIN_DIR)/client
-SERVER_EXEC = $(BIN_DIR)/server
+CFLAGS = 
+BIN_DIR = bin
 
-# Récupérer tous les fichiers source
-SERVER_SRCS = $(wildcard $(SRC_DIR)/**/*.c $(SRC_DIR)/*.c)
-CLIENT_SRCS = client.c util.c
+# Création des exécutables
+all: $(BIN_DIR)/server $(BIN_DIR)/client
 
-# Générer les fichiers objets
-SERVER_OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SERVER_SRCS))
-CLIENT_OBJS = $(patsubst %.c, $(OBJ_DIR)/%.o, $(CLIENT_SRCS))
+# Compilation du serveur
+$(BIN_DIR)/server: serveur/controller/controller.c serveur/model/donnees/awale.c serveur/model/services/lobbyManager.c serveur/model/services/messageManager.c serveur/model/services/partieManager.c serveur/vue/echange.c
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/server serveur/controller/controller.c serveur/model/donnees/awale.c serveur/model/services/lobbyManager.c serveur/model/services/messageManager.c serveur/model/services/partieManager.c serveur/vue/echange.c
 
-# Règle par défaut
-all: setup $(SERVER_EXEC) $(CLIENT_EXEC)
+# Compilation du client
+$(BIN_DIR)/client: util.c client.c
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/client util.c client.c
 
-# Créer les dossiers nécessaires
-setup:
-	mkdir -p $(OBJ_DIR)
-	mkdir -p $(BIN_DIR)
-
-# Compiler le serveur
-$(SERVER_EXEC): $(SERVER_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
-
-# Compiler le client
-$(CLIENT_EXEC): $(CLIENT_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
-
-# Compiler les fichiers objets pour le serveur
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Compiler les fichiers objets pour le client
-$(OBJ_DIR)/%.o: %.c
-	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Nettoyage
+# Nettoyage des fichiers compilés
 clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
-
-# Exécuter le serveur
-run_server: $(SERVER_EXEC)
-	$(SERVER_EXEC) $(PORT)
-
-# Exécuter le client
-run_client: $(CLIENT_EXEC)
-	$(CLIENT_EXEC) 127.0.0.1 $(PORT)
-
-# Ajout dynamique du port
-PORT ?= 8080
-
+	rm -rf $(BIN_DIR)

@@ -1,6 +1,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/select.h>
+#include <stdlib.h>
+
 #include "../model/donnees/constants.h"
 #include "../model/services/lobbyManager.h"
 #include "../model/services/messageManager.h"
@@ -20,80 +22,71 @@ void message_handler(Joueur *joueur, char *message)
     }
     if (strcmp(command, "nom") == 0)
     {
-        commande_nom(joueur, lobby, body);
+        strcpy(joueur->nom, body);
+        joueur->status = LOBBY;
+        envoyer_rejoindre(joueur, lobby);
+        usleep(2000);
+        envoyer_liste_joueurs(lobby, joueur);
     }
 
     else if (strcmp(command, "listeJoueurs") == 0)
     {
-        commande_listeJoueurs(joueur, lobby);
+        envoyer_liste_joueurs(lobby, joueur);
     }
 
     else if (strcmp(command, "defier") == 0)
     {
-        commande_defier(lobby, joueur, destinataire);
+        Joueur *defie = defier_joueur(lobby, destinataire);
+        if (strcmp(joueur->nom, destinataire) == 0)
+        {
+            envoyer_erreur(joueur); // Vous ne pouvez pas vous défier vous-même.
+        }
+        else if (defie != NULL)
+        {
+            defie->status = DEFI;
+            joueur->status = DEFI;
+            envoyer_defi(joueur, defie);
+        }
+        else
+        {
+            envoyer_erreur(joueur); // Le joueur %s n'est pas disponible pour un défi.
+        }
     }
 
     else if (strcmp(command, "declinerDefi") == 0)
     {
-        commande_declinerDefi(lobby, joueur, destinataire);
+        Joueur *demandeur = trouver_joueur(lobby, destinataire);
+        if (demandeur != NULL)
+        {
+            envoyer_decliner_defi(joueur, demandeur);
+            demandeur->status = LOBBY;
+            joueur->status = LOBBY;
+        }
     }
 
     else if (strcmp(command, "accepterDefi") == 0)
     {
-        Joueur *demandeur = trouverJoueurParNom(lobby, destinataire);
-        if (demandeur != NULL)
+        Joueur *demandeur = trouver_joueur(lobby, destinataire);
+        if (demandeur == NULL)
         {
-            char msg[MAX_MESSAGE_SIZE];
-            snprintf(msg, sizeof(msg), "/message #%s #server %s a accepté votre défi.", demandeur->nom, joueur->nom);
-            envoyer(demandeur, msg);
-
-            demandeur->status = PARTIE;
-            joueur->status = PARTIE;
-
-            // Initialiser la partie
-            Jeu *jeu = malloc(sizeof(Jeu));
-            // vérification de l'existance du jeu
-            if (jeu == NULL)
-            {
-                perror("Erreur d'allocation mémoire pour le jeu");
-                exit(1);
-            }
-            jeu->joueur1 = demandeur;
-            jeu->joueur2 = joueur;
-            jeu->current = demandeur;
-            jeu->joueur1 = demandeur;
-            jeu->joueur2 = joueur;
-
-            if (jeu->joueur1 == NULL || jeu->joueur2 == NULL || jeu->current == NULL)
-            {
-                fprintf(stderr, "Les joueurs ne sont pas correctement initialisés.\n");
-                free(jeu); // Libération de la mémoire pour éviter une fuite
-                exit(1);
-            }
-
-            joueur->idPartie = lobby->nbJeux;
-            demandeur->idPartie = lobby->nbJeux;
-
-            lobby->jeux[lobby->nbJeux] = jeu;
-            printf("Joueur 1: %s, Joueur 2: %s\n", jeu->joueur1->nom, jeu->joueur2->nom);
-            char *plateau_msg = malloc(sizeof(char) * 1024);
-            plateau_msg = initialiserPartie(lobby->jeux[joueur->idPartie]);
-            snprintf(plateau_msg, sizeof(char) * 1024, "/message #server #%s Plateau initial :\n %s\n", demandeur->nom, plateau_msg);
-            envoyerAuxJoueurs(lobby->jeux[joueur->idPartie], plateau_msg);
-            lobby->nbJeux++;
-            int nombreAleatoire = (rand() % 2) + 1;
-            if (nombreAleatoire == 1)
-            {
-                lobby->jeux[joueur->idPartie]->current = lobby->jeux[joueur->idPartie]->joueur1;
-            }
-            else
-            {
-                lobby->jeux[joueur->idPartie]->current = lobby->jeux[joueur->idPartie]->joueur2;
-            }
-            envoyer_le_joueur_courant(lobby->jeux[joueur->idPartie]);
-            demander_case_depart(lobby->jeux[joueur->idPartie]->current);
+            envoyer_erreur(joueur); // Le joueur %s n'existe pas ou n'est pas connecté.
         }
+        envoyer_accepter_defi(joueur, demandeur);
+        // Initialiser la partie
+        initialiser_jeu(lobby, demandeur, joueur);
+
+        Jeu *jeu = lobby->jeux[joueur->idPartie];
+        if (jeu == NULL)
+        {
+            perror("Erreur d'allocation mémoire pour le jeu");
+            exit(1);
+        }
+
+        envoyer_plateau(jeu);
+        envoyer_le_joueur_courant(jeu);
+        demander_case_depart(jeu->current);
     }
+
     else if (strcmp(command, "message") == 0)
     {
         commande_message(destinataire, expediteur, lobby, body);
@@ -109,14 +102,50 @@ void message_handler(Joueur *joueur, char *message)
         printf("Commande inconnue reçue: %s\n", command);
     }
 }
+
+int check_if_message(Lobby *lobby, fd_set *readfds)
+{
+    for (int i = 0; i < lobby->nbJoueurs; i++)
+    {
+        Joueur *joueur = lobby->joueurs[i];
+        char message[MAX_MESSAGE_SIZE];
+        int n;
+
+        if (FD_ISSET(*joueur->socket, readfds))
+        {
+            n = read(*joueur->socket, message, MAX_MESSAGE_SIZE);
+            if (n < 0)
+            {
+                perror("Erreur de lecture du socket");
+                continue;
+            }
+            if (n == 0)
+            {
+                printf("Client déconnecté\n");
+                close(*joueur->socket);
+                FD_CLR(*joueur->socket, readfds);
+                free(joueur->nom);
+                free(joueur);
+                lobby->joueurs[i] = lobby->joueurs[--lobby->nbJoueurs];
+                i--;
+                continue;
+            }
+
+            message[n] = '\0';
+            printf("Message reçu de %s: %s\n", joueur->nom, message);
+            message_handler(joueur, message);
+        }
+    }
+
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     int sockfd;
-    struct sockaddr_in serv_addr, cli_addr;
-    socklen_t clilen;
+    struct sockaddr_in serv_addr;
     fd_set readfds;
     int max_fd;
-    int i, n;
     if (argc != 2)
     {
         printf("usage: socket_server port\n");
