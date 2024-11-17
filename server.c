@@ -205,6 +205,27 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                         lobby->nbJeux++;
                     }
                 }
+                else if (strcmp(command, "message") == 0)
+                {
+                    // Find the target player by their name
+                    Joueur *destinataireJoueur = trouverJoueurParNom(lobby, destinataire);
+                    if (destinataireJoueur != NULL)
+                    {
+                        // Format the message to be sent to the target player
+                        char msg[MAX_MESSAGE_SIZE];
+                        snprintf(msg, sizeof(msg), "/message #%s #%s %s", destinataire, joueur->nom, body);
+                        envoyer(destinataireJoueur, msg);
+                        printf("Message envoyé à %s de la part de %s: %s\n", destinataire, joueur->nom, body);
+                    }
+                    else
+                    {
+                        // Send an error message back to the sender if the recipient does not exist
+                        char error_msg[MAX_MESSAGE_SIZE];
+                        snprintf(error_msg, sizeof(error_msg), "/message #server #%s Le joueur %s n'existe pas ou n'est pas connecté.", joueur->nom, destinataire);
+                        envoyer(joueur, error_msg);
+                        printf("Erreur : Le joueur %s n'existe pas ou n'est pas connecté.\n", destinataire);
+                    }
+                }
 
                 else
                 {
