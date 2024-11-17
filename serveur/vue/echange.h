@@ -5,7 +5,8 @@
 #include "../model/donnees/lobby.h"
 
 // Envoyer erreur
-void envoyer_erreur(Joueur *joueur);
+int envoyer_erreur(Joueur *joueur);
 int envoyer_message(Joueur *joueur, char *message);
+int envoyer_a_tous(Lobby *lobby, char *message);
 
 #endif

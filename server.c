@@ -284,8 +284,8 @@ int main(int argc, char **argv)
     lobby->jeux = malloc(MAX_PARTIES * sizeof(Jeu *));
     lobby->nbJeux = 0;
 
-    FD_ZERO(&readfds);        // Initialisation de l'ensemble des descripteurs à surveiller
-    FD_SET(sockfd, &readfds); // Ajout du socket d'écoute à l'ensemble des descripteurs à surveiller
+    FD_ZERO(&readfds);
+    FD_SET(sockfd, &readfds);
     max_fd = sockfd;
     while (1)
     {

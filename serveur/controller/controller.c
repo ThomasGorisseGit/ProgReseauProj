@@ -16,65 +16,24 @@ void message_handler(Joueur *joueur, char *message)
         envoyer_erreur(joueur);
         return;
     }
-    if (strcmp(command, "name") == 0)
+    if (strcmp(command, "nom") == 0)
     {
-        strcpy(joueur->nom, body);
-        joueur->status = LOBBY;
-        printf("Nom du joueur %d mis à jour : %s\n", joueur->idJoueur, joueur->nom);
-
-        // Envoi du message "joining" proprement formaté
-        char join_msg[MAX_MESSAGE_SIZE];
-        snprintf(join_msg, sizeof(join_msg), "/joining #server #%s Un nouveau joueur a rejoint le lobby : %s\n", joueur->nom, joueur->nom);
-        envoyerATousDansLobby(lobby, join_msg);
-        usleep(2000);
-        char lobby_msg[MAX_MESSAGE_SIZE];
-        snprintf(lobby_msg, sizeof(lobby_msg), "/displayLobby #server #%s %s", joueur->nom, toStringLobby(lobby));
-        envoyer(joueur, lobby_msg);
+        commande_nom(joueur, lobby, body);
     }
 
     else if (strcmp(command, "listeJoueurs") == 0)
     {
-        char liste_message[MAX_MESSAGE_SIZE];
-        snprintf(liste_message, sizeof(liste_message), "/listeJoueurs #server #%s %s", joueur->nom, toStringLobby(lobby));
-        envoyer(joueur, liste_message);
+        commande_listeJoueurs(joueur, lobby);
     }
 
     else if (strcmp(command, "defier") == 0)
     {
-        Joueur *defie = defierJoueur(lobby, destinataire);
-        if (strcmp(joueur->nom, destinataire) == 0)
-        {
-            char defier_msg[MAX_MESSAGE_SIZE];
-            snprintf(defier_msg, sizeof(defier_msg), "/message #%s #%s Vous ne pouvez pas vous défier vous-même.", joueur->nom, joueur->nom);
-            envoyer(joueur, defier_msg);
-        }
-        else if (defie != NULL)
-        {
-            defie->status = DEFI;
-            joueur->status = DEFI;
-            char defier_msg[MAX_MESSAGE_SIZE];
-            snprintf(defier_msg, sizeof(defier_msg), "/defier #%s #%s Le joueur %s veut vous défier. Pour accepter, tapez 1 ; pour refuser, tapez 0.", defie->nom, joueur->nom, joueur->nom);
-            envoyer(defie, defier_msg);
-        }
-        else
-        {
-            char error_msg[MAX_MESSAGE_SIZE];
-            snprintf(error_msg, sizeof(error_msg), "/message #%s #serveur Le joueur %s n'est pas disponible pour un défi.", joueur->nom, destinataire);
-            envoyer(joueur, error_msg);
-        }
+        commande_defier(lobby, joueur, destinataire);
     }
 
     else if (strcmp(command, "declinerDefi") == 0)
     {
-        Joueur *demandeur = trouverJoueurParNom(lobby, destinataire);
-        if (demandeur != NULL)
-        {
-            char msg[MAX_MESSAGE_SIZE];
-            snprintf(msg, sizeof(msg), "/message #%s #server %s a refusé votre défi.", demandeur->nom, joueur->nom);
-            envoyer(demandeur, msg);
-            demandeur->status = LOBBY;
-            joueur->status = LOBBY;
-        }
+        commande_declinerDefi(lobby, joueur, destinataire);
     }
 
     else if (strcmp(command, "accepterDefi") == 0)
@@ -124,24 +83,7 @@ void message_handler(Joueur *joueur, char *message)
     }
     else if (strcmp(command, "message") == 0)
     {
-        // Find the target player by their name
-        Joueur *destinataireJoueur = trouverJoueurParNom(lobby, destinataire);
-        if (destinataireJoueur != NULL)
-        {
-            // Format the message to be sent to the target player
-            char msg[MAX_MESSAGE_SIZE];
-            snprintf(msg, sizeof(msg), "/message #%s #%s %s", destinataire, joueur->nom, body);
-            envoyer(destinataireJoueur, msg);
-            printf("Message envoyé à %s de la part de %s: %s\n", destinataire, joueur->nom, body);
-        }
-        else
-        {
-            // Send an error message back to the sender if the recipient does not exist
-            char error_msg[MAX_MESSAGE_SIZE];
-            snprintf(error_msg, sizeof(error_msg), "/message #server #%s Le joueur %s n'existe pas ou n'est pas connecté.", joueur->nom, destinataire);
-            envoyer(joueur, error_msg);
-            printf("Erreur : Le joueur %s n'existe pas ou n'est pas connecté.\n", destinataire);
-        }
+        commande_message(destinataire, expediteur, lobby, body);
     }
 
     else
