@@ -1,6 +1,5 @@
 #ifndef AWALE_H
 #define AWALE_H
-#define MAX_MESSAGE_SIZE 1024
 
 #include <stdio.h>
 #include <string.h>
@@ -17,6 +16,7 @@ typedef struct Joueur
     int score;
     int *socket;
     Status status;
+    int idPartie;
 } Joueur;
 
 typedef struct Case

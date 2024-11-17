@@ -15,4 +15,5 @@ char *initialiserPartie(Jeu *jeu);
 
 Joueur *trouverJoueurParNom(Lobby *lobby, const char *nom);
 
+void envoyerAuxJoueurs(Jeu *jeu, char *message);
 #endif // PARTIE_H

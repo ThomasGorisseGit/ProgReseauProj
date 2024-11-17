@@ -9,7 +9,7 @@ void initialiserPlateau(Jeu *jeu)
     if (jeu->plateau == NULL)
     {
         printf("Plateau pas encore initialisé.");
-        Case *plateau = malloc(sizeof(plateau));
+        Case *plateau = malloc(sizeof(Case) * 12);
         jeu->plateau = plateau;
     }
 
@@ -18,26 +18,33 @@ void initialiserPlateau(Jeu *jeu)
     // Initialiser les graines et les propriétaires des cases
     for (int i = 0; i < 12; i++)
     {
+        printf("a");
         jeu->plateau[i].nbGraines = 4; // 4 graines par case
     }
     for (int i = 0; i < 6; i++)
     {
+        printf("b");
         jeu->plateau[i].proprietaire = jeu->joueur1; // Cases 0-5 appartiennent à joueur1
     }
     for (int i = 6; i < 12; i++)
     {
+        printf("c");
         jeu->plateau[i].proprietaire = jeu->joueur2; // Cases 6-11 appartiennent à joueur2
     }
 
     // Initialiser les scores des joueurs
+    printf("d");
     jeu->joueur1->score = 0;
     jeu->joueur2->score = 0;
 }
 
 char *afficherPlateau(Jeu *jeu)
 {
+    printf("here");
     // Allocate memory for the board display
-    char *plateauStr = malloc(MAX_MESSAGE_SIZE * sizeof(char));
+    char *plateauStr = malloc(2048 * sizeof(char));
+    printf("here2");
+
     if (plateauStr == NULL)
     {
         perror("Erreur d'allocation mémoire pour le plateau");
@@ -46,7 +53,7 @@ char *afficherPlateau(Jeu *jeu)
     plateauStr[0] = '\0'; // Initialize the string
 
     // Add player 1 information
-    char buffer[256];
+    char buffer[2048];
     snprintf(buffer, sizeof(buffer), "Joueur 1 : %s\nScore : %d\n\n", jeu->joueur1->nom, jeu->joueur1->score);
     strcat(plateauStr, buffer);
 

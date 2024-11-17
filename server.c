@@ -168,8 +168,10 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                         char msg[MAX_MESSAGE_SIZE];
                         snprintf(msg, sizeof(msg), "/message #%s #server %s a accepté votre défi.", demandeur->nom, joueur->nom);
                         envoyer(demandeur, msg);
+
                         demandeur->status = PARTIE;
                         joueur->status = PARTIE;
+
                         // Initialiser la partie
                         Jeu *jeu = malloc(sizeof(Jeu));
                         // vérification de l'existance du jeu
@@ -190,11 +192,17 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                             free(jeu); // Libération de la mémoire pour éviter une fuite
                             exit(1);
                         }
+
+                        joueur->idPartie = lobby->nbJeux;
+                        demandeur->idPartie = lobby->nbJeux;
+
+                        lobby->jeux[lobby->nbJeux] = jeu;
                         printf("Joueur 1: %s, Joueur 2: %s\n", jeu->joueur1->nom, jeu->joueur2->nom);
                         char *plateau_msg = malloc(sizeof(char) * 1024);
-                        plateau_msg = initialiserPartie(jeu);
+                        plateau_msg = initialiserPartie(lobby->jeux[joueur->idPartie]);
                         snprintf(plateau_msg, sizeof(char) * 1024, "/message #server #%s Plateau initial :\n %s\n", demandeur->nom, plateau_msg);
-                        envoyer(demandeur, plateau_msg);
+                        envoyerAuxJoueurs(lobby->jeux[joueur->idPartie], plateau_msg);
+                        lobby->nbJeux++;
                     }
                 }
 
@@ -251,8 +259,12 @@ int main(int argc, char **argv)
     printf("En attente de connexions\n");
 
     Lobby *lobby = malloc(sizeof(Lobby));
+
     lobby->joueurs = malloc(MAX_PLAYER * sizeof(Joueur *));
     lobby->nbJoueurs = 0;
+
+    lobby->jeux = malloc(MAX_PARTIES * sizeof(Jeu *));
+    lobby->nbJeux = 0;
 
     FD_ZERO(&readfds);
     FD_SET(sockfd, &readfds);

@@ -55,6 +55,7 @@ char *initialiserPartie(Jeu *jeu)
     printf("Initialisation de la partie...\n");
     initialiserPlateau(jeu); // Utilisation de la fonction existante pour initialiser le plateau
     printf("Plateau initialisé\n\n");
+    printf("Joueur 1 : %s\n", jeu->joueur2->nom);
     char *plateau = afficherPlateau(jeu);
 
     printf("La partie est prête à commencer.\n");
@@ -72,4 +73,10 @@ Joueur *trouverJoueurParNom(Lobby *lobby, const char *nom)
         }
     }
     return NULL; // Retourne NULL si le joueur n'est pas trouvé
+}
+
+void envoyerAuxJoueurs(Jeu *jeu, char *message)
+{
+    envoyer(jeu->joueur1, message);
+    envoyer(jeu->joueur2, message);
 }
