@@ -191,9 +191,9 @@ void handle_message(Lobby *lobby, fd_set *readfds)
                             exit(1);
                         }
                         printf("Joueur 1: %s, Joueur 2: %s\n", jeu->joueur1->nom, jeu->joueur2->nom);
-                        char *plateau_msg = malloc(sizeof(char *));
+                        char *plateau_msg = malloc(sizeof(char) * 1024);
                         plateau_msg = initialiserPartie(jeu);
-                        snprintf(plateau_msg, sizeof(plateau_msg), "/plateau #server #%s Plateau initial :\n %s\n", demandeur, plateau_msg);
+                        snprintf(plateau_msg, sizeof(char) * 1024, "/message #server #%s Plateau initial :\n %s\n", demandeur->nom, plateau_msg);
                         envoyer(demandeur, plateau_msg);
                     }
                 }

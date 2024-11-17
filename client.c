@@ -25,7 +25,7 @@ void afficher_guide()
 }
 void handle_message(char *message, int *sockfd)
 {
-    char command[50], destinataire[50], body[150], expediteur[50];
+    char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE], expediteur[MAX_DESTINATAIRE_SIZE];
     if (verifierFormatMessage(message, command, destinataire, body, expediteur))
     {
         if (strcmp(command, "joining") == 0)
