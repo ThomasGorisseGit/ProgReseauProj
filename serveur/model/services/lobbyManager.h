@@ -10,6 +10,7 @@
 #include "../donnees/constants.h"
 
 Lobby *initialiserLobby();
+void fin_partie(Jeu *jeu);
 
 void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby);
 #endif // LOBBY_H

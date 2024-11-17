@@ -47,3 +47,15 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
     if (*newsockfd > *max_fd)
         *max_fd = *newsockfd;
 }
+
+void fin_partie(Jeu *jeu)
+{
+    jeu->joueur1->status = LOBBY;
+    jeu->joueur2->status = LOBBY;
+
+    jeu->joueur1->idPartie = -1;
+    jeu->joueur2->idPartie = -1;
+
+    free(jeu);
+    jeu = NULL;
+}

@@ -79,16 +79,3 @@ int check_if_message(Lobby *lobby, fd_set *readfds)
 
     return 0;
 }
-int envoyer_message(Joueur *joueur, char *message)
-{
-    int n;
-    n = write(*joueur->socket, message, strlen(message));
-    printf("Message envoyé:%s\n", message);
-    if (n < 0)
-    {
-        printf("ERROR");
-        perror("ERROR writing to socket");
-        exit(1);
-    }
-    return n;
-}

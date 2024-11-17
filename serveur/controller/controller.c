@@ -5,6 +5,8 @@
 #include "../model/services/lobbyManager.h"
 #include "../model/services/messageManager.h"
 #include "../vue/echange.h"
+#include "../model/donnees/awale.h"
+#include "../model/services/partieManager.h"
 Lobby *lobby;
 
 void message_handler(Joueur *joueur, char *message)
@@ -18,6 +20,7 @@ void message_handler(Joueur *joueur, char *message)
     }
     if (strcmp(command, "name") == 0)
     {
+
         strcpy(joueur->nom, body);
         joueur->status = LOBBY;
         printf("Nom du joueur %d mis à jour : %s\n", joueur->idJoueur, joueur->nom);
@@ -120,6 +123,17 @@ void message_handler(Joueur *joueur, char *message)
             snprintf(plateau_msg, sizeof(char) * 1024, "/message #server #%s Plateau initial :\n %s\n", demandeur->nom, plateau_msg);
             envoyerAuxJoueurs(lobby->jeux[joueur->idPartie], plateau_msg);
             lobby->nbJeux++;
+            int nombreAleatoire = (rand() % 2) + 1;
+            if (nombreAleatoire == 1)
+            {
+                lobby->jeux[joueur->idPartie]->current = lobby->jeux[joueur->idPartie]->joueur1;
+            }
+            else
+            {
+                lobby->jeux[joueur->idPartie]->current = lobby->jeux[joueur->idPartie]->joueur2;
+            }
+            envoyer_le_joueur_courant(lobby->jeux[joueur->idPartie]);
+            demander_case_depart(lobby->jeux[joueur->idPartie]->current);
         }
     }
     else if (strcmp(command, "message") == 0)
@@ -142,6 +156,10 @@ void message_handler(Joueur *joueur, char *message)
             envoyer(joueur, error_msg);
             printf("Erreur : Le joueur %s n'existe pas ou n'est pas connecté.\n", destinataire);
         }
+    }
+    else if (strcmp(command, "coup") == 0)
+    {
+        gerer_coup(lobby->jeux[joueur->idPartie], joueur, atoi(body));
     }
 
     else
