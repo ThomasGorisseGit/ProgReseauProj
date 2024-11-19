@@ -43,7 +43,7 @@ void envoyer_le_joueur_courant(Jeu *jeu)
 void demander_case_depart(Joueur *joueur)
 {
     char message[MAX_MESSAGE_SIZE];
-    snprintf(message, sizeof(message), "/message #server #%s Entrez la case de départ ", joueur->nom);
+    snprintf(message, sizeof(message), "/case #server #%s Entrez la case de départ ", joueur->nom);
     envoyer_message(joueur, message);
 }
 void envoyer_gagnant(Jeu *jeu)

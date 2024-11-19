@@ -57,3 +57,11 @@ int verifierFormatMessage(char *message, char *command, char *expediteur, char *
 
     return 1;
 }
+
+char *lireInput()
+{
+    char *input = malloc(MAX_BODY_SIZE);
+    fgets(input, MAX_BODY_SIZE, stdin);
+    input[strcspn(input, "\n")] = '\0';
+    return input;
+}

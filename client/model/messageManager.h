@@ -14,4 +14,5 @@
 
 void ecrire(int *socket, char *command, char *expediteur, char *destinataire, char *body);
 int verifierFormatMessage(char *message, char *command, char *expediteur, char *destinataire, char *body);
+char *lireInput();
 #endif // MESSAGE_MANAGER_H

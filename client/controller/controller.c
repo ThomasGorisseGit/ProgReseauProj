@@ -12,7 +12,7 @@ void handle_server_message(char *message, int *sockfd)
         }
         else if (strcmp(command, "defier") == 0)
         {
-            char formatted_message[MAX_BODY_SIZE];
+            char formatted_message[MAX_MESSAGE_SIZE];
             snprintf(formatted_message, sizeof(formatted_message), "Défi reçu de %s : %s", expediteur, body);
             afficher_message(COLOR_RED, formatted_message);
 
@@ -29,15 +29,21 @@ void handle_server_message(char *message, int *sockfd)
         }
         else if (strcmp(command, "listeJoueurs") == 0)
         {
-            char formatted_message[MAX_BODY_SIZE];
+            char formatted_message[MAX_MESSAGE_SIZE];
             snprintf(formatted_message, sizeof(formatted_message), "La liste des joueurs disponibles : %s", body);
             afficher_message(COLOR_BLUE, formatted_message);
         }
         else if (strcmp(command, "message") == 0)
         {
-            char formatted_message[MAX_BODY_SIZE];
+            char formatted_message[MAX_MESSAGE_SIZE];
             snprintf(formatted_message, sizeof(formatted_message), "Message de %s : %s", expediteur, body);
             afficher_message(COLOR_RED, formatted_message);
+        }
+        else if (strcmp(command, "case") == 0)
+        {
+            afficher_message(COLOR_GREEN, body);
+            char *input = lireInput();
+            ecrire(sockfd, "coup", destinataire, expediteur, input);
         }
         else
         {
@@ -49,15 +55,15 @@ void handle_server_message(char *message, int *sockfd)
         afficher_message(COLOR_RED, "Message du serveur invalide.");
     }
 }
-
 // Gère les entrées utilisateur
 void handle_client_input(char *user_input, int *sockfd, char *nom)
 {
+
     if (strcmp(user_input, "/listeJoueurs") == 0)
     {
         ecrire(sockfd, "listeJoueurs", nom, "server", "");
     }
-    else if (strncmp(user_input, "/defier ", 7) == 0)
+    else if (strncmp(user_input, "/defier ", 8) == 0)
     {
         char *target = user_input + 8;
         ecrire(sockfd, "defier", nom, target, "");
@@ -93,6 +99,8 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
     }
     else
     {
+        printf("%s - %d\n", user_input, strncmp(user_input, "/defier ", 8));
+        afficher_message(COLOR_RED, user_input);
         afficher_message(COLOR_YELLOW, "Commande inconnue. Tapez /aide pour voir les commandes disponibles.");
     }
 }
@@ -159,9 +167,8 @@ void event_loop(int sockfd, char *nom)
         // Gestion des entrées utilisateur
         if (FD_ISSET(STDIN_FILENO, &readfds))
         {
-            char user_input[256];
-            fgets(user_input, sizeof(user_input), stdin);
-            user_input[strcspn(user_input, "\n")] = '\0';
+
+            char *user_input = lireInput();
             handle_client_input(user_input, &sockfd, nom);
         }
     }
@@ -170,11 +177,9 @@ void event_loop(int sockfd, char *nom)
 // Demande et enregistre le nom de l'utilisateur
 char *register_user(int sockfd)
 {
-    char *nom = malloc(50);
 
     afficher_message(COLOR_BLUE, "Entrez votre nom :");
-    fgets(nom, sizeof(nom), stdin);
-    nom[strcspn(nom, "\n")] = '\0';
+    char *nom = lireInput();
     ecrire(&sockfd, "nom", nom, "server", nom);
     return nom;
 }

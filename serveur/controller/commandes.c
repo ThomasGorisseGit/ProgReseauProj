@@ -78,6 +78,7 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
         envoyer_erreur(joueur); // Le joueur %s n'existe pas ou n'est pas connecté.
     }
     envoyer_accepter_defi(joueur, demandeur);
+    usleep(2000);
 
     // Initialiser la partie
     initialiser_jeu(lobby, demandeur, joueur);
@@ -92,12 +93,76 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
     // récupération du plateau de jeu
     char *string_plateau = afficherPlateau(jeu);
     envoyer_plateau(jeu, string_plateau);
+    usleep(2000);
+
     envoyer_le_joueur_courant(jeu);
+    usleep(2000);
+
     demander_case_depart(jeu->current);
 }
 
 void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
 {
     int case_depart = atoi(body);
-    gerer_coup(lobby->jeux[joueur->idPartie], joueur, case_depart);
+    Jeu *jeu = lobby->jeux[joueur->idPartie];
+
+    if (joueur->idPartie == -1)
+    {
+        envoyer_erreur(joueur);
+        return;
+    }
+    if (joueur->status != PARTIE)
+    {
+        envoyer_erreur(joueur);
+        return;
+    }
+    if (jeu->current->nom != joueur->nom)
+    {
+        envoyer_erreur(joueur);
+        return;
+    }
+    int coups_valide = jouerCoup(jeu, case_depart);
+    if (coups_valide == -1)
+    {
+        // Le coups est invalide, on redemande a l'utilisateur
+        envoyer_erreur(joueur);
+        usleep(2000);
+
+        demander_case_depart(joueur);
+        return;
+    }
+    if (coups_valide == 0)
+    {
+        // égalité
+        envoyer_egalite(jeu);
+        usleep(2000);
+        fin_partie(jeu);
+    }
+    if (jeu->vainqueur != NULL)
+    {
+        // On a un vainqueur
+        envoyer_gagnant(jeu);
+        usleep(2000);
+        fin_partie(jeu);
+    }
+
+    if (coups_valide == 1)
+    {
+        // on continue la partie :
+        char *string_plateau = malloc(sizeof(char) * 2048);
+        string_plateau = afficherPlateau(jeu);
+        envoyer_plateau(jeu, string_plateau);
+        usleep(2000);
+        if (jeu->current == jeu->joueur1)
+        {
+            jeu->current = jeu->joueur2;
+        }
+        else
+        {
+            jeu->current = jeu->joueur1;
+        }
+        envoyer_le_joueur_courant(jeu);
+        usleep(2000);
+        demander_case_depart(jeu->current);
+    }
 }
