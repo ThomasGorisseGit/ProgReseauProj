@@ -13,8 +13,13 @@ $(BIN_DIR)/server: serveur/controller/controller.c serveur/model/donnees/awale.c
 
 # Compilation du client
 $(BIN_DIR)/client: client/controller/controller.c client/model/messageManager.c client/vue/display.c
+<<<<<<< HEAD
     @mkdir -p $(BIN_DIR)
     $(CC) $(CFLAGS) -o $(BIN_DIR)/client client/controller/controller.c client/model/messageManager.c client/vue/display.c
+=======
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/client client/controller/controller.c client/model/messageManager.c client/vue/display.c
+>>>>>>> origin/merge
 
 # Nettoyage des fichiers compilés
 clean:
