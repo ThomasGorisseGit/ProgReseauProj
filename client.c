@@ -30,13 +30,9 @@ void handle_message(char *message, int *sockfd)
     char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE], expediteur[MAX_DESTINATAIRE_SIZE];
     if (verifierFormatMessage(message, command, expediteur, destinataire, body))
     {
-        if (strcmp(command, "joining") == 0)
+        if (strcmp(command, "rejoindre") == 0)
         {
             printf(COLOR_YELLOW "%s\n" COLOR_RESET, body);
-        }
-        else if (strcmp(command, "displayLobby") == 0)
-        {
-            printf(COLOR_BLUE "%s\n" COLOR_RESET, body);
         }
         else if (strcmp(command, "defier") == 0)
         {
@@ -171,7 +167,7 @@ int main(int argc, char **argv)
                 char *target = user_input + 8; // Extrait le nom cible
                 ecrire(&sockfd, "defier", target, "", nom);
             }
-            else if (strcmp(user_input, "/help") == 0)
+            else if (strcmp(user_input, "/aide") == 0)
             {
                 afficher_guide();
             }
@@ -208,7 +204,7 @@ int main(int argc, char **argv)
             }
             else
             {
-                printf(COLOR_YELLOW "Commande inconnue. Utilisez /help pour voir les commandes disponibles.\n" COLOR_RESET);
+                printf(COLOR_YELLOW "Commande inconnue. Utilisez /aide pour voir les commandes disponibles.\n" COLOR_RESET);
             }
         }
     }

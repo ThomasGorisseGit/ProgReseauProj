@@ -9,6 +9,8 @@
 #include "../vue/echange.h"
 #include "../model/donnees/awale.h"
 #include "../model/services/partieManager.h"
+#include "commandes.h"
+
 Lobby *lobby;
 
 void message_handler(Joueur *joueur, char *message)
@@ -22,69 +24,27 @@ void message_handler(Joueur *joueur, char *message)
     }
     if (strcmp(command, "nom") == 0)
     {
-        strcpy(joueur->nom, body);
-        joueur->status = LOBBY;
-        envoyer_rejoindre(joueur, lobby);
-        usleep(2000);
-        envoyer_liste_joueurs(lobby, joueur);
+        commande_nom(joueur, lobby, body);
     }
 
     else if (strcmp(command, "listeJoueurs") == 0)
     {
-        envoyer_liste_joueurs(lobby, joueur);
+        commande_listeJoueurs(joueur, lobby);
     }
 
     else if (strcmp(command, "defier") == 0)
     {
-        Joueur *defie = defier_joueur(lobby, destinataire);
-        if (strcmp(joueur->nom, destinataire) == 0)
-        {
-            envoyer_erreur(joueur); // Vous ne pouvez pas vous défier vous-même.
-        }
-        else if (defie != NULL)
-        {
-            defie->status = DEFI;
-            joueur->status = DEFI;
-            envoyer_defi(joueur, defie);
-        }
-        else
-        {
-            envoyer_erreur(joueur); // Le joueur %s n'est pas disponible pour un défi.
-        }
+        commande_defier(lobby, joueur, destinataire);
     }
 
     else if (strcmp(command, "declinerDefi") == 0)
     {
-        Joueur *demandeur = trouver_joueur(lobby, destinataire);
-        if (demandeur != NULL)
-        {
-            envoyer_decliner_defi(joueur, demandeur);
-            demandeur->status = LOBBY;
-            joueur->status = LOBBY;
-        }
+        commande_declinerDefi(lobby, joueur, destinataire);
     }
 
     else if (strcmp(command, "accepterDefi") == 0)
     {
-        Joueur *demandeur = trouver_joueur(lobby, destinataire);
-        if (demandeur == NULL)
-        {
-            envoyer_erreur(joueur); // Le joueur %s n'existe pas ou n'est pas connecté.
-        }
-        envoyer_accepter_defi(joueur, demandeur);
-        // Initialiser la partie
-        initialiser_jeu(lobby, demandeur, joueur);
-
-        Jeu *jeu = lobby->jeux[joueur->idPartie];
-        if (jeu == NULL)
-        {
-            perror("Erreur d'allocation mémoire pour le jeu");
-            exit(1);
-        }
-
-        envoyer_plateau(jeu);
-        envoyer_le_joueur_courant(jeu);
-        demander_case_depart(jeu->current);
+        commande_accepterDefi(lobby, joueur, destinataire);
     }
 
     else if (strcmp(command, "message") == 0)
@@ -93,8 +53,7 @@ void message_handler(Joueur *joueur, char *message)
     }
     else if (strcmp(command, "coup") == 0)
     {
-        int case_depart = atoi(body);
-        gerer_coup(lobby->jeux[joueur->idPartie], joueur, case_depart);
+        commande_jouerCoup(lobby, joueur, body);
     }
 
     else

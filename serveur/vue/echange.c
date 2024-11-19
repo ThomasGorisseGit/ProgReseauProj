@@ -80,7 +80,18 @@ void envoyer_liste_joueurs(Lobby *lobby, Joueur *joueur)
     {
         message = strcat(message, lobby->joueurs[i]->nom);
         message = strcat(message, "\t\t | \t");
-        message = strcat(message, lobby->joueurs[i]->status == LOBBY ? "Lobby" : "En partie");
+        if (lobby->joueurs[i]->status == LOBBY)
+        {
+            message = strcat(message, "Lobby");
+        }
+        else if (lobby->joueurs[i]->status == INIT)
+        {
+            message = strcat(message, "Initialisation");
+        }
+        else
+        {
+            message = strcat(message, "En partie");
+        }
         message = strcat(message, "\n");
     }
 
@@ -99,7 +110,7 @@ void envoyer_defi(Joueur *joueur, Joueur *defie)
 void envoyer_rejoindre(Joueur *joueur, Lobby *lobby)
 {
     char message[MAX_MESSAGE_SIZE];
-    snprintf(message, sizeof(message), "/joining #server #%s Un nouveau joueur a rejoint le lobby : %s\n", joueur->nom, joueur->nom);
+    snprintf(message, sizeof(message), "/rejoindre #server #%s Un nouveau joueur a rejoint le lobby : %s\n", joueur->nom, joueur->nom);
     envoyer_a_tous(lobby, message);
 }
 void envoyer_decliner_defi(Joueur *joueur, Joueur *demandeur)
