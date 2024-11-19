@@ -1,7 +1,7 @@
 
 #ifndef COMMANDES_H
 #define COMMANDES_H
-
+#include <string.h>
 #include "../model/donnees/constants.h"
 #include "../model/services/lobbyManager.h"
 #include "../model/services/messageManager.h"

@@ -78,6 +78,7 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
         envoyer_erreur(joueur); // Le joueur %s n'existe pas ou n'est pas connecté.
     }
     envoyer_accepter_defi(joueur, demandeur);
+
     // Initialiser la partie
     initialiser_jeu(lobby, demandeur, joueur);
 
@@ -88,7 +89,9 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
         exit(1);
     }
 
-    envoyer_plateau(jeu);
+    // récupération du plateau de jeu
+    char *string_plateau = afficherPlateau(jeu);
+    envoyer_plateau(jeu, string_plateau);
     envoyer_le_joueur_courant(jeu);
     demander_case_depart(jeu->current);
 }

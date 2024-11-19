@@ -60,10 +60,12 @@ void envoyer_egalite(Jeu *jeu)
     envoyer_message(jeu->joueur1, message);
     envoyer_message(jeu->joueur2, message);
 }
-void envoyer_plateau(Jeu *jeu)
+void envoyer_plateau(Jeu *jeu, char *string_plateau)
 {
-    envoyer_message(jeu->joueur1, "plateau");
-    envoyer_message(jeu->joueur2, "plateau");
+    char message[MAX_MESSAGE_SIZE];
+    snprintf(message, sizeof(message), "/message #server #%s Plateau de jeu : \n%s", jeu->joueur1->nom, string_plateau);
+    envoyer_message(jeu->joueur1, message);
+    envoyer_message(jeu->joueur2, message);
 }
 
 void envoyer_liste_joueurs(Lobby *lobby, Joueur *joueur)

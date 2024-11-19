@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "../donnees/constants.h"
 #include "../donnees/lobby.h"
 void initialiserPlateau(Jeu *jeu);

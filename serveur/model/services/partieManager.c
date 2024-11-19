@@ -41,7 +41,9 @@ void gerer_coup(Jeu *jeu, Joueur *joueur, int case_depart)
     if (coups_valide == 1)
     {
         // on continue la partie :
-        envoyer_plateau(jeu);
+        char *string_plateau = malloc(sizeof(char) * 2048);
+        string_plateau = afficherPlateau(jeu);
+        envoyer_plateau(jeu, string_plateau);
         if (jeu->current == jeu->joueur1)
         {
             jeu->current = jeu->joueur2;
@@ -77,21 +79,21 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
     if (jeu == NULL)
     {
         perror("Erreur d'allocation mémoire pour le jeu");
+        printf("Erreur d'allocation mémoire pour le jeu");
         exit(1);
     }
     jeu->joueur1 = demandeur;
     jeu->joueur2 = joueur;
-    jeu->current = demandeur;
-    jeu->joueur1 = demandeur;
-    jeu->joueur2 = joueur;
 
-    if (jeu->joueur1 == NULL || jeu->joueur2 == NULL || jeu->current == NULL)
+    printf("Joueurs : %s et %s\n", jeu->joueur1->nom, jeu->joueur2->nom);
+
+    if (jeu->joueur1 == NULL || jeu->joueur2 == NULL)
     {
         fprintf(stderr, "Les joueurs ne sont pas correctement initialisés.\n");
         free(jeu); // Libération de la mémoire pour éviter une fuite
         exit(1);
     }
-
+    initialiserPlateau(jeu);
     joueur->idPartie = lobby->nbJeux;
     demandeur->idPartie = lobby->nbJeux;
 

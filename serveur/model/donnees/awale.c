@@ -1,102 +1,87 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include "awale.h"
 
 void initialiserPlateau(Jeu *jeu)
 {
     if (jeu->plateau == NULL)
     {
-        printf("Plateau pas encore initialisé.");
         Case *plateau = malloc(sizeof(Case) * 12);
         jeu->plateau = plateau;
     }
 
-    printf("Init du plateau\n");
-
     // Initialiser les graines et les propriétaires des cases
     for (int i = 0; i < 12; i++)
     {
-        printf("a");
         jeu->plateau[i].nbGraines = 4; // 4 graines par case
     }
     for (int i = 0; i < 6; i++)
     {
-        printf("b");
         jeu->plateau[i].proprietaire = jeu->joueur1; // Cases 0-5 appartiennent à joueur1
     }
     for (int i = 6; i < 12; i++)
     {
-        printf("c");
         jeu->plateau[i].proprietaire = jeu->joueur2; // Cases 6-11 appartiennent à joueur2
     }
 
     // Initialiser les scores des joueurs
-    printf("d");
     jeu->joueur1->score = 0;
     jeu->joueur2->score = 0;
 }
 
 char *afficherPlateau(Jeu *jeu)
 {
-    printf("here");
-    // Allocate memory for the board display
-    char *plateauStr = malloc(2048 * sizeof(char));
-    printf("here2");
 
-    if (plateauStr == NULL)
+    // Taille fixe pour éviter les erreurs de dépassement
+    char buffer[5000];
+    int pos = 0; // Position actuelle dans le buffer
+
+    // Informations sur le joueur 1
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "Joueur 1 : %s\nScore : %d\n\n",
+                    jeu->joueur1->nom, jeu->joueur1->score);
+
+    // Informations sur le joueur 2
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "Joueur 2 : %s\nScore : %d\n\n",
+                    jeu->joueur2->nom, jeu->joueur2->score);
+
+    // Rangée supérieure : indices
+    for (int i = 0; i < 6; i++)
+    {
+        pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  %d  ", i);
+    }
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+
+    // Rangée supérieure : graines
+    for (int i = 0; i < 6; i++)
+    {
+        pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  %d  ", jeu->plateau[i].nbGraines);
+    }
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+
+    // Ligne de séparation
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "-------------------------------\n");
+
+    // Rangée inférieure : indices
+    for (int i = 11; i > 5; i--)
+    {
+        pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  %d  ", i);
+    }
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+
+    // Rangée inférieure : graines
+    for (int i = 11; i > 5; i--)
+    {
+        pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  %d  ", jeu->plateau[i].nbGraines);
+    }
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+
+    // Allouer dynamiquement la chaîne finale
+    char *result = strdup(buffer);
+    if (result == NULL)
     {
         perror("Erreur d'allocation mémoire pour le plateau");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
-    plateauStr[0] = '\0'; // Initialize the string
 
-    // Add player 1 information
-    char buffer[2048];
-    snprintf(buffer, sizeof(buffer), "Joueur 1 : %s\nScore : %d\n\n", jeu->joueur1->nom, jeu->joueur1->score);
-    strcat(plateauStr, buffer);
-
-    // Add player 2 information
-    snprintf(buffer, sizeof(buffer), "Joueur 2 : %s\nScore : %d\n\n", jeu->joueur2->nom, jeu->joueur2->score);
-    strcat(plateauStr, buffer);
-
-    // Upper row indices
-    for (int i = 0; i < 6; i++)
-    {
-        snprintf(buffer, sizeof(buffer), "  %d  ", i);
-        strcat(plateauStr, buffer);
-    }
-    strcat(plateauStr, "\n");
-
-    // Upper row seeds
-    for (int i = 0; i < 6; i++)
-    {
-        snprintf(buffer, sizeof(buffer), "  %d  ", jeu->plateau[i].nbGraines);
-        strcat(plateauStr, buffer);
-    }
-    strcat(plateauStr, "\n");
-
-    // Separator line
-    strcat(plateauStr, "-------------------------------\n");
-
-    // Lower row indices
-    for (int i = 11; i > 5; i--)
-    {
-        snprintf(buffer, sizeof(buffer), "  %d  ", i);
-        strcat(plateauStr, buffer);
-    }
-    strcat(plateauStr, "\n");
-
-    // Lower row seeds
-    for (int i = 11; i > 5; i--)
-    {
-        snprintf(buffer, sizeof(buffer), "  %d  ", jeu->plateau[i].nbGraines);
-        strcat(plateauStr, buffer);
-    }
-    strcat(plateauStr, "\n");
-
-    return plateauStr;
+    return result;
 }
 
 int verifierCasDarret(Jeu *jeu)
