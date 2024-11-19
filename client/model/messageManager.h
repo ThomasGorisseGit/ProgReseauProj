@@ -1,0 +1,4 @@
+#ifndef MESSAGE_MANAGER_H
+#define MESSAGE_MANAGER_H
+
+#endif // MESSAGE_MANAGER_H

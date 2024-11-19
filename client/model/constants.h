@@ -1,0 +1,15 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#define COLOR_RESET "\033[0m"
+#define COLOR_RED "\033[31m"
+#define COLOR_GREEN "\033[32m"
+#define COLOR_YELLOW "\033[33m"
+#define COLOR_BLUE "\033[34m"
+
+#define MAX_COMMAND_SIZE 50
+#define MAX_DESTINATAIRE_SIZE 50
+#define MAX_BODY_SIZE 2000
+#define MAX_MESSAGE_SIZE 2150
+
+#endif // CONSTANTS_H
