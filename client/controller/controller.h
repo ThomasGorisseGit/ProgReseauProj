@@ -13,6 +13,14 @@
 #include <sys/select.h>
 #include "../model/constants.h"
 #include "../vue/display.h"
+#include "../model/messageManager.h"
 
 int main(int argc, char **argv);
+
+void handle_server_message(char *message, int *sockfd);
+void handle_client_input(char *user_input, int *sockfd, char *nom);
+int init_connection(const char *server_ip, const char *server_port);
+void event_loop(int sockfd, char *nom);
+char *register_user(int sockfd);
+
 #endif // CLI_CONTROLLER_H

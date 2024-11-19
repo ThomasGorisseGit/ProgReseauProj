@@ -11,9 +11,9 @@ $(BIN_DIR)/server: serveur/controller/controller.c serveur/model/donnees/awale.c
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/server serveur/controller/controller.c serveur/model/donnees/awale.c serveur/model/services/lobbyManager.c serveur/model/services/messageManager.c serveur/model/services/partieManager.c serveur/vue/echange.c serveur/controller/commandes.c
 
 # Compilation du client
-$(BIN_DIR)/client: util.c client.c
+$(BIN_DIR)/client: client/controller/controller.c client/model/messageManager.c client/vue/display.c
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/client util.c client.c
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/client client/controller/controller.c client/model/messageManager.c client/vue/display.c
 
 # Nettoyage des fichiers compilés
 clean:

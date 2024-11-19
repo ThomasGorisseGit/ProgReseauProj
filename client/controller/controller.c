@@ -1,96 +1,131 @@
 #include "controller.h"
 
-// Affiche le guide d'utilisation des commandes
-
-void handle_message(char *message, int *sockfd)
+void handle_server_message(char *message, int *sockfd)
 {
     char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE], expediteur[MAX_DESTINATAIRE_SIZE];
+
     if (verifierFormatMessage(message, command, expediteur, destinataire, body))
     {
         if (strcmp(command, "rejoindre") == 0)
         {
-            printf(COLOR_YELLOW "%s\n" COLOR_RESET, body);
+            afficher_message(COLOR_GREEN, body);
         }
         else if (strcmp(command, "defier") == 0)
         {
-            printf(COLOR_RED "Défi reçu de %s : %s\n" COLOR_RESET, expediteur, body);
-            // Demander une réponse de l'utilisateur
-            char response[10];
-            fgets(response, sizeof(response), stdin);
-            response[strcspn(response, "\n")] = 0;
+            char formatted_message[MAX_BODY_SIZE];
+            snprintf(formatted_message, sizeof(formatted_message), "Défi reçu de %s : %s", expediteur, body);
+            afficher_message(COLOR_RED, formatted_message);
 
-            if (strcmp(response, "1") == 0)
-            {
-                ecrire(sockfd, "accepterDefi", expediteur, "Le défi est accepté.", destinataire);
-            }
-            else
-            {
-                ecrire(sockfd, "declinerDefi", expediteur, "Le défi est refusé.", destinataire);
-            }
+            // Demande de réponse utilisateur
+            char response[10];
+            afficher_message(COLOR_RESET, "Accepter le défi ? (1 pour oui, 0 pour non) : ");
+            fgets(response, sizeof(response), stdin);
+            response[strcspn(response, "\n")] = '\0';
+
+            // Envoi de la réponse
+            snprintf(formatted_message, sizeof(formatted_message),
+                     strcmp(response, "1") == 0 ? "Le défi est accepté." : "Le défi est refusé.");
+            ecrire(sockfd, strcmp(response, "1") == 0 ? "accepterDefi" : "declinerDefi", destinataire, expediteur, formatted_message);
         }
         else if (strcmp(command, "listeJoueurs") == 0)
         {
-            printf(COLOR_BLUE "La liste des joueurs disponibles est la suivante : %s\n" COLOR_RESET, body);
+            char formatted_message[MAX_BODY_SIZE];
+            snprintf(formatted_message, sizeof(formatted_message), "La liste des joueurs disponibles : %s", body);
+            afficher_message(COLOR_BLUE, formatted_message);
         }
         else if (strcmp(command, "message") == 0)
         {
-            printf(COLOR_RED "Message reçu de %s : %s\n" COLOR_RESET, expediteur, body);
+            char formatted_message[MAX_BODY_SIZE];
+            snprintf(formatted_message, sizeof(formatted_message), "Message de %s : %s", expediteur, body);
+            afficher_message(COLOR_RED, formatted_message);
         }
         else
         {
-            printf(COLOR_RED "Commande inconnue du serveur\n" COLOR_RESET);
-            printf("%s\n", message);
+            afficher_message(COLOR_YELLOW, "Commande inconnue du serveur.");
         }
     }
     else
     {
-        printf(COLOR_RED "Message du serveur invalide : %s\n" COLOR_RESET, message);
-        printf("%s\n", message);
+        afficher_message(COLOR_RED, "Message du serveur invalide.");
     }
 }
 
-int main(int argc, char **argv)
+// Gère les entrées utilisateur
+void handle_client_input(char *user_input, int *sockfd, char *nom)
+{
+    if (strcmp(user_input, "/listeJoueurs") == 0)
+    {
+        ecrire(sockfd, "listeJoueurs", nom, "server", "");
+    }
+    else if (strncmp(user_input, "/defier ", 7) == 0)
+    {
+        char *target = user_input + 8;
+        ecrire(sockfd, "defier", nom, target, "");
+    }
+    else if (strcmp(user_input, "/aide") == 0)
+    {
+        afficher_guide();
+    }
+    else if (strncmp(user_input, "/message ", 9) == 0)
+    {
+        char *input = user_input + 9;
+        char *colon_pos = strchr(input, ':');
+        if (colon_pos != NULL)
+        {
+            *colon_pos = '\0';
+            char *target = input;
+            char *message = colon_pos + 1;
+            while (isspace((unsigned char)*message))
+                message++;
+            if (strlen(target) > 0 && strlen(message) > 0)
+            {
+                ecrire(sockfd, "message", target, nom, message);
+            }
+            else
+            {
+                afficher_message(COLOR_YELLOW, "Erreur : /message nécessite un destinataire et un contenu.");
+            }
+        }
+        else
+        {
+            afficher_message(COLOR_YELLOW, "Erreur : Utilisez un ':' pour séparer le destinataire et le message.");
+        }
+    }
+    else
+    {
+        afficher_message(COLOR_YELLOW, "Commande inconnue. Tapez /aide pour voir les commandes disponibles.");
+    }
+}
+// Initialise la connexion au serveur
+int init_connection(const char *server_ip, const char *server_port)
 {
     int sockfd;
     struct sockaddr_in serv_addr;
 
-    if (argc != 3)
-    {
-        printf(COLOR_RED "usage: socket_client server port\n" COLOR_RESET);
-        exit(0);
-    }
-
-    printf(COLOR_BLUE "Client starting...\n" COLOR_RESET);
-
-    // Initialisation du serveur
-    bzero((char *)&serv_addr, sizeof(serv_addr));
+    bzero(&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
-    serv_addr.sin_port = htons(atoi(argv[2]));
+    serv_addr.sin_addr.s_addr = inet_addr(server_ip);
+    serv_addr.sin_port = htons(atoi(server_port));
 
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        perror("Socket error");
-        exit(0);
+        perror("Erreur de création de socket");
+        exit(EXIT_FAILURE);
     }
 
     if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
-        perror("Connect error");
-        exit(0);
+        perror("Erreur de connexion au serveur");
+        exit(EXIT_FAILURE);
     }
 
-    // Demander le nom de l'utilisateur avant de rejoindre le lobby
-    char nom[50];
-    printf(COLOR_BLUE "Entrez votre nom : " COLOR_RESET);
-    fgets(nom, sizeof(nom), stdin);
-    nom[strcspn(nom, "\n")] = '\0'; // Supprimer le saut de ligne
+    return sockfd;
+}
 
-    // Envoyer la commande de nom au serveur avec l’expéditeur
-    ecrire(&sockfd, "nom", "server", nom, nom);
-
+// Gère la communication avec le serveur et l'utilisateur
+void event_loop(int sockfd, char *nom)
+{
     fd_set readfds;
-    char buffer[1024];
 
     while (1)
     {
@@ -98,94 +133,71 @@ int main(int argc, char **argv)
         FD_SET(sockfd, &readfds);
         FD_SET(STDIN_FILENO, &readfds);
 
-        int max_fd = sockfd > STDIN_FILENO ? sockfd : STDIN_FILENO;
-        int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
-
-        if (activity < 0)
+        if (select(sockfd + 1, &readfds, NULL, NULL, NULL) < 0)
         {
-            perror("select error");
+            perror("Erreur avec select");
             break;
         }
 
-        // Lecture des messages du serveur
+        // Gestion des messages du serveur
         if (FD_ISSET(sockfd, &readfds))
         {
+            char buffer[1024];
             int n = read(sockfd, buffer, sizeof(buffer) - 1);
             if (n > 0)
             {
                 buffer[n] = '\0';
-                handle_message(buffer, &sockfd);
-            }
-            else if (n == 0)
-            {
-                printf(COLOR_RED "Serveur déconnecté.\n" COLOR_RESET);
-                break;
+                handle_server_message(buffer, &sockfd);
             }
             else
             {
-                perror("Erreur de lecture depuis le serveur");
+                afficher_message(COLOR_RED, "Le serveur s'est déconnecté.");
+                break;
             }
         }
 
-        // Lecture des commandes utilisateur
+        // Gestion des entrées utilisateur
         if (FD_ISSET(STDIN_FILENO, &readfds))
         {
             char user_input[256];
             fgets(user_input, sizeof(user_input), stdin);
-            user_input[strcspn(user_input, "\n")] = 0; // Supprime le saut de ligne
-
-            // Vérifie la commande et l'envoie au serveur avec le nom comme expéditeur
-            if (strcmp(user_input, "/listeJoueurs") == 0)
-            {
-                ecrire(&sockfd, "listeJoueurs", "server", "", nom);
-            }
-            else if (strncmp(user_input, "/defier ", 7) == 0)
-            {
-                char *target = user_input + 8; // Extrait le nom cible
-                ecrire(&sockfd, "defier", target, "", nom);
-            }
-            else if (strcmp(user_input, "/aide") == 0)
-            {
-                afficher_guide();
-            }
-            else if (strncmp(user_input, "/message ", 9) == 0) // Vérifie si la commande commence par "/message"
-            {
-                char *input = user_input + 9;         // Extrait tout après "/message "
-                char *colon_pos = strchr(input, ':'); // Cherche le premier ':'
-
-                if (colon_pos != NULL)
-                {
-                    *colon_pos = '\0';             // Remplace ':' par '\0' pour séparer le nom et le message
-                    char *target = input;          // Le nom est avant le ':'
-                    char *message = colon_pos + 1; // Le message est après le ':'
-
-                    // Supprime les espaces superflus au début du message
-                    while (isspace((unsigned char)*message))
-                    {
-                        message++;
-                    }
-
-                    if (strlen(target) > 0 && strlen(message) > 0)
-                    {
-                        ecrire(&sockfd, "message", target, message, nom);
-                    }
-                    else
-                    {
-                        printf(COLOR_YELLOW "Erreur : La commande /message nécessite un nom et un message.\n" COLOR_RESET);
-                    }
-                }
-                else
-                {
-                    printf(COLOR_YELLOW "Erreur : La commande /message nécessite un ':' pour séparer le nom et le message.\n" COLOR_RESET);
-                }
-            }
-            else
-            {
-                printf(COLOR_YELLOW "Commande inconnue. Utilisez /aide pour voir les commandes disponibles.\n" COLOR_RESET);
-            }
+            user_input[strcspn(user_input, "\n")] = '\0';
+            handle_client_input(user_input, &sockfd, nom);
         }
     }
+}
+
+// Demande et enregistre le nom de l'utilisateur
+char *register_user(int sockfd)
+{
+    char *nom = malloc(50);
+
+    afficher_message(COLOR_BLUE, "Entrez votre nom :");
+    fgets(nom, sizeof(nom), stdin);
+    nom[strcspn(nom, "\n")] = '\0';
+    ecrire(&sockfd, "nom", nom, "server", nom);
+    return nom;
+}
+
+int main(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        afficher_message(COLOR_RED, "Usage : socket_client <server_ip> <server_port>");
+        return EXIT_FAILURE;
+    }
+
+    afficher_message(COLOR_BLUE, "Client starting...");
+
+    // Initialisation de la connexion au serveur
+    int sockfd = init_connection(argv[1], argv[2]);
+
+    // Enregistrement du nom de l'utilisateur
+    char *nom = register_user(sockfd);
+
+    // Boucle principale
+    event_loop(sockfd, nom);
 
     close(sockfd);
-    return 0;
+    return EXIT_SUCCESS;
 }
