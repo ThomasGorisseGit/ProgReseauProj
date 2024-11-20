@@ -7,11 +7,30 @@ void commande_listeJoueurs(Joueur *joueur, Lobby *lobby)
 
 void commande_nom(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE])
 {
-    strcpy(joueur->nom, body);
-    joueur->status = LOBBY;
-    envoyer_rejoindre(joueur, lobby);
-    usleep(2000);
-    envoyer_liste_joueurs(lobby, joueur);
+    int used = 0;
+    for (int i = 0; i < lobby->nbJoueurs; i++)
+    {
+        if (strcmp(lobby->joueurs[i]->nom, body) == 0)
+        {
+            used = 1;
+            break;
+        }
+    }
+    if (used == 0)
+    {
+        strcpy(joueur->nom, body);
+        joueur->status = LOBBY;
+        envoyer_nom_valide(joueur);
+        usleep(2000);
+        envoyer_rejoindre(joueur, lobby);
+
+        usleep(2000);
+        envoyer_liste_joueurs(lobby, joueur);
+    }
+    else
+    {
+        envoyer_nom_invalide(joueur);
+    }
 }
 
 void commande_message(char destinataire[MAX_DESTINATAIRE_SIZE], char expediteur[MAX_DESTINATAIRE_SIZE], Lobby *lobby, char body[MAX_BODY_SIZE])

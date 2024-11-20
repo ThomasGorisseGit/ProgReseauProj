@@ -127,3 +127,16 @@ void envoyer_accepter_defi(Joueur *joueur, Joueur *demandeur)
     snprintf(message, sizeof(message), "/message #server #%s %s a accepté votre défi.", demandeur->nom, joueur->nom);
     envoyer_message(demandeur, message);
 }
+void envoyer_nom_valide(Joueur *joueur)
+{
+    char message[MAX_MESSAGE_SIZE];
+    snprintf(message, sizeof(message), "/nomValide #server #%s Pseudo Valide !", joueur->nom);
+    envoyer_message(joueur, message);
+}
+
+void envoyer_nom_invalide(Joueur *joueur)
+{
+    char message[MAX_MESSAGE_SIZE];
+    snprintf(message, sizeof(message), "/nomInvalide #server #%s Pseudo Invalide, veuillez en choisir un autre !", joueur->nom);
+    envoyer_message(joueur, message);
+}

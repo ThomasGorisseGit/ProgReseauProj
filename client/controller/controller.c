@@ -1,5 +1,6 @@
 #include "controller.h"
 
+int nomSet = 0;
 void handle_server_message(char *message, int *sockfd)
 {
     char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE], expediteur[MAX_DESTINATAIRE_SIZE];
@@ -44,6 +45,15 @@ void handle_server_message(char *message, int *sockfd)
             afficher_message(COLOR_GREEN, body);
             char *input = lireInput();
             ecrire(sockfd, "coup", destinataire, expediteur, input);
+        }
+        else if (strcmp(command, "nomValide") == 0)
+        {
+            nomSet = 1;
+            afficher_message(COLOR_GREEN, body);
+        }
+        else if (strcmp(command, "nomInvalide") == 0)
+        {
+            afficher_message(COLOR_RED, body);
         }
         else
         {
@@ -174,13 +184,26 @@ void event_loop(int sockfd, char *nom)
     }
 }
 
-// Demande et enregistre le nom de l'utilisateur
 char *register_user(int sockfd)
 {
-
     afficher_message(COLOR_BLUE, "Entrez votre nom :");
     char *nom = lireInput();
     ecrire(&sockfd, "nom", nom, "server", nom);
+
+    // Attente d'une réponse
+    char buffer[1024];
+    int n = read(sockfd, buffer, sizeof(buffer) - 1);
+    if (n > 0)
+    {
+        buffer[n] = '\0';
+        handle_server_message(buffer, &sockfd);
+    }
+    else
+    {
+        afficher_message(COLOR_RED, "Erreur de communication avec le serveur.");
+        exit(EXIT_FAILURE);
+    }
+
     return nom;
 }
 
@@ -197,9 +220,13 @@ int main(int argc, char **argv)
     // Initialisation de la connexion au serveur
     int sockfd = init_connection(argv[1], argv[2]);
 
-    // Enregistrement du nom de l'utilisateur
-    char *nom = register_user(sockfd);
+    char *nom = malloc(MAX_DESTINATAIRE_SIZE * sizeof(char));
 
+    // Enregistrement du nom de l'utilisateur
+    while (nomSet == 0)
+    {
+        nom = register_user(sockfd);
+    }
     // Boucle principale
     event_loop(sockfd, nom);
 
