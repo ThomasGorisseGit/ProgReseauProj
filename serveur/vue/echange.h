@@ -14,7 +14,7 @@ void demander_case_depart(Joueur *joueur);
 void envoyer_gagnant(Jeu *jeu);
 void envoyer_egalite(Jeu *jeu);
 
-void envoyer_plateau(Jeu *jeu, char *string_plateau);
+void envoyer_plateau(Jeu *jeu);
 void envoyer_a_tous(Lobby *lobby, char *message);
 void envoyer_liste_joueurs(Lobby *lobby, Joueur *joueur);
 void envoyer_defi(Joueur *joueur, Joueur *defie);

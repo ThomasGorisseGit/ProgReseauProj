@@ -60,10 +60,53 @@ void envoyer_egalite(Jeu *jeu)
     envoyer_message(jeu->joueur1, message);
     envoyer_message(jeu->joueur2, message);
 }
-void envoyer_plateau(Jeu *jeu, char *string_plateau)
+void envoyer_plateau(Jeu *jeu)
 {
+
+    char buffer[MAX_BODY_SIZE];
+    int pos = 0;
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "Joueur 2 : %s\nScore : %d\n\n",
+                    jeu->joueur2->nom, jeu->joueur2->score);
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ");
+    for (int i = 6; i < 12; i++)
+    {
+        pos += snprintf(buffer + pos, sizeof(buffer) - pos, " %2d  ", i);
+    }
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+
+    // Rangée supérieure : graines
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ");
+    for (int i = 6; i < 12; i++)
+    {
+        pos += snprintf(buffer + pos, sizeof(buffer) - pos, " %2d  ", jeu->plateau[i].nbGraines);
+    }
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+
+    // Ligne de séparation
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ----------------------------\n");
+
+    // Rangée inférieure : indices (0 à 5)
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ");
+    for (int i = 5; i >= 0; i--)
+    {
+        pos += snprintf(buffer + pos, sizeof(buffer) - pos, " %2d  ", i);
+    }
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+
+    // Rangée inférieure : graines
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ");
+    for (int i = 5; i >= 0; i--)
+    {
+        pos += snprintf(buffer + pos, sizeof(buffer) - pos, " %2d  ", jeu->plateau[i].nbGraines);
+    }
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n\n");
+
+    // Informations sur le joueur 1
+    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "Joueur 1 : %s\nScore : %d\n",
+                    jeu->joueur1->nom, jeu->joueur1->score);
+
     char message[MAX_MESSAGE_SIZE];
-    snprintf(message, sizeof(message), "/message #server #%s Plateau de jeu : \n%s", jeu->joueur1->nom, string_plateau);
+    snprintf(message, sizeof(message), "/message #server #%s %s", jeu->joueur1->nom, buffer);
     envoyer_message(jeu->joueur1, message);
     envoyer_message(jeu->joueur2, message);
 }

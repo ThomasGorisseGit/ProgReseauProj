@@ -91,8 +91,8 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
     }
 
     // récupération du plateau de jeu
-    char *string_plateau = afficherPlateau(jeu);
-    envoyer_plateau(jeu, string_plateau);
+    // char *string_plateau = afficherPlateau(jeu);
+    envoyer_plateau(jeu);
     usleep(2000);
 
     envoyer_le_joueur_courant(jeu);
@@ -172,10 +172,10 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
     if (coups_valide == 1)
     {
         // on continue la partie :
-        char *string_plateau = malloc(sizeof(char) * 2048);
-        string_plateau = afficherPlateau(jeu);
+        // char *string_plateau = malloc(sizeof(char) * 2048);
+        // string_plateau = afficherPlateau(jeu);
         printf("AFFICHAGE PLATEAU ET ENVOIE");
-        envoyer_plateau(jeu, string_plateau);
+        envoyer_plateau(jeu);
         usleep(2000);
         printf("CHANGEMENT JOUEUR");
         if (jeu->current == jeu->joueur1)
