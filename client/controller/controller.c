@@ -38,7 +38,7 @@ void handle_server_message(char *message, int *sockfd)
         {
             char formatted_message[MAX_MESSAGE_SIZE];
             snprintf(formatted_message, sizeof(formatted_message), "Message de %s : %s", expediteur, body);
-            afficher_message(COLOR_RED, formatted_message);
+            afficher_message(COLOR_BLUE, formatted_message);
         }
         else if (strcmp(command, "case") == 0)
         {

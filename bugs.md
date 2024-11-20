@@ -12,7 +12,5 @@ Implémenter un système d'ELO
 Donner la possibilité a une utilisateur d'avoir une bio pour se présenter
 
 ///TODO :
-Tester l'envoie de message
 Gérer les messages d'erreurs en partie
 Gérer les couleurs un peu mieux
-Gérer l'inscription de 2 joueurs avec le meme pseudo
