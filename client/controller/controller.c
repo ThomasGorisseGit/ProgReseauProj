@@ -79,13 +79,13 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
         if (colon_pos != NULL)
         {
             *colon_pos = '\0';
-            char *target = input;
-            char *message = colon_pos + 1;
+            char *target = input;          // Récupère le destinataire
+            char *message = colon_pos + 1; // Récupère le contenu du message
             while (isspace((unsigned char)*message))
-                message++;
+                message++; // Supprime les espaces avant le contenu
             if (strlen(target) > 0 && strlen(message) > 0)
             {
-                ecrire(sockfd, "message", target, nom, message);
+                ecrire(sockfd, "message", nom, target, message); // Corrige l'ordre des paramètres
             }
             else
             {
