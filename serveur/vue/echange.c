@@ -49,7 +49,7 @@ void demander_case_depart(Joueur *joueur)
 void envoyer_gagnant(Jeu *jeu)
 {
     char message[MAX_MESSAGE_SIZE];
-    snprintf(message, sizeof(message), "/message #server #%s a gagné", jeu->vainqueur->nom);
+    snprintf(message, sizeof(message), "/message #server #%s %s a gagné la partie", jeu->vainqueur->nom, jeu->vainqueur->nom);
     envoyer_message(jeu->joueur1, message);
     envoyer_message(jeu->joueur2, message);
 }
@@ -126,4 +126,44 @@ void envoyer_accepter_defi(Joueur *joueur, Joueur *demandeur)
     char message[MAX_MESSAGE_SIZE];
     snprintf(message, sizeof(message), "/message #server #%s %s a accepté votre défi.", demandeur->nom, joueur->nom);
     envoyer_message(demandeur, message);
+}
+
+void envoyer_bio(Joueur *joueur)
+{
+    char message[MAX_MESSAGE_SIZE];
+    snprintf(message, sizeof(message), "/modifierBio #server #%s Votre bio a été modifiée : %s", joueur->nom, joueur->bio);
+    envoyer_message(joueur, message);
+}
+void envoyer_elo_joueurs(Jeu *jeu)
+{
+    char message[MAX_MESSAGE_SIZE];
+    snprintf(message, sizeof(message), "/message #server #%s Votre ELO est de %f", jeu->joueur1->nom, jeu->joueur1->elo);
+    envoyer_message(jeu->joueur1, message);
+    snprintf(message, sizeof(message), "/message #server #%s Votre ELO est de %f", jeu->joueur2->nom, jeu->joueur2->elo);
+    envoyer_message(jeu->joueur2, message);
+}
+void envoyer_classement(Lobby *lobby, Joueur *joueur)
+{
+    int totalLength = strlen("Classement des joueurs :\n");
+    for (int i = 0; i < lobby->nbJoueurs; i++)
+    {
+        totalLength += strlen(lobby->joueurs[i]->nom) + 1; // +1 pour le saut de ligne
+    }
+    char *message = malloc(totalLength * sizeof(char));
+
+    strcpy(message, "Pseudo\t\t\t | \t\tELO\n");
+    message = strcat(message, "-------------------------|-------------------------\n");
+    for (int i = 0; i < lobby->nbJoueurs; i++)
+    {
+        message = strcat(message, lobby->joueurs[i]->nom);
+        message = strcat(message, "\t\t\t | \t\t");
+        char elo[10];
+        snprintf(elo, sizeof(elo), "%f", lobby->joueurs[i]->elo);
+        message = strcat(message, elo);
+        message = strcat(message, "\n");
+    }
+
+    char messageToSend[MAX_MESSAGE_SIZE];
+    snprintf(messageToSend, sizeof(messageToSend), "/classement #server #%s Classement des joueurs : \n%s", joueur->nom, message);
+    envoyer_message(joueur, messageToSend);
 }

@@ -53,9 +53,29 @@ void message_handler(Joueur *joueur, char *message)
     }
     else if (strcmp(command, "coup") == 0)
     {
+        printf("Commande coup reçue\n");
+        printf("Joueur: %s, score : %d, idPartie : %d\n", joueur->nom, joueur->score, joueur->idPartie);
+        printf("Lobby : nb jeux%d, %p \n", lobby->nbJeux, lobby->jeux[joueur->idPartie]);
+        printf("Body : %s\n", body);
+        int case_depart = atoi(body);
+        printf("Case départ : %d\n", case_depart);
+        Jeu *jeu = lobby->jeux[joueur->idPartie];
+        printf("Jeu : %s\n", jeu->current->nom);
+        printf("winner: %p", jeu->vainqueur);
         commande_jouerCoup(lobby, joueur, body);
     }
-
+    else if (strcmp(command, "modifierBio") == 0)
+    {
+        commande_modifierBio(joueur, body);
+    }
+    else if (strcmp(command, "consulterBio") == 0)
+    {
+        commande_consulterBio(joueur, lobby, body);
+    }
+    else if (strcmp(command, "classement") == 0)
+    {
+        commande_classement(joueur, lobby);
+    }
     else
     {
         printf("Commande inconnue reçue: %s\n", command);
@@ -91,7 +111,7 @@ int check_if_message(Lobby *lobby, fd_set *readfds)
             }
 
             message[n] = '\0';
-            printf("Message reçu de %s: %s\n", joueur->nom, message);
+            printf("\n\nMessage reçu de %s: %s\n\n", joueur->nom, message);
             message_handler(joueur, message);
         }
     }

@@ -19,6 +19,8 @@ typedef struct Joueur
     Status status;
     int idPartie;
     int idJoueur;
+    char *bio;
+    double elo;
 } Joueur;
 
 typedef struct Case

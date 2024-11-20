@@ -1,4 +1,3 @@
-
 #ifndef COMMANDES_H
 #define COMMANDES_H
 #include <string.h>
@@ -16,5 +15,8 @@ void commande_defier(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINA
 void commande_declinerDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINATAIRE_SIZE]);
 void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINATAIRE_SIZE]);
 void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE]);
+void commande_modifierBio(Joueur *joueur, char body[MAX_BODY_SIZE]);
+void commande_consulterBio(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE]);
+void commande_classement(Joueur *joueur, Lobby *lobby);
 
 #endif // COMMANDES_H

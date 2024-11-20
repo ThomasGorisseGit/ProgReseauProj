@@ -1,5 +1,4 @@
 #include "partieManager.h"
-
 void qui_commence(Jeu *jeu)
 {
     int nombreAleatoire = (rand() % 2) + 1;
@@ -56,4 +55,12 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
     lobby->nbJeux++;
     srand(time(NULL));
     qui_commence(jeu);
+}
+void calculerElo(Joueur *joueur1, Joueur *joueur2, int resultatA)
+{
+    double E1 = 1.0 / (1.0 + pow(10, (joueur2->elo - joueur1->elo) / 400.0));
+    double E2 = 1.0 / (1.0 + pow(10, (joueur1->elo - joueur2->elo) / 400.0));
+
+    joueur1->elo = joueur1->elo + FACTEUR_DAJUSTEMENT_ELO * (resultatA - E1);
+    joueur2->elo = joueur2->elo + FACTEUR_DAJUSTEMENT_ELO * ((1 - resultatA) - E2);
 }
