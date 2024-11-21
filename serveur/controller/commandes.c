@@ -55,6 +55,23 @@ void commande_message(char destinataire[MAX_DESTINATAIRE_SIZE], char expediteur[
     }
 }
 
+void commande_message_global(Lobby *lobby, char expediteur[MAX_DESTINATAIRE_SIZE], char body[MAX_BODY_SIZE])
+{
+    Joueur *expediteurJoueur = trouver_joueur(lobby, expediteur);
+
+    for (int i = 0; i < lobby->nbJoueurs; i++)
+    {
+        Joueur *destinataireJoueur = lobby->joueurs[i];
+
+        if (destinataireJoueur != NULL && destinataireJoueur->status == LOBBY && destinataireJoueur != expediteurJoueur)
+        {
+            commande_message(destinataireJoueur->nom, expediteur, lobby, body);
+        }
+    }
+
+    printf("Message global envoyé par %s à tous les joueurs sauf lui-même : %s\n", expediteur, body);
+}
+
 void commande_defier(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINATAIRE_SIZE])
 {
     Joueur *defie = defier_joueur(lobby, destinataire);

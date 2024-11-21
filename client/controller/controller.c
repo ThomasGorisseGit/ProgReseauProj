@@ -101,6 +101,20 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
     {
         ecrire(sockfd, "classement", nom, "server", "");
     }
+    else if (strncmp(user_input, "/messageGlobal ", 15) == 0)
+    {
+        char *input = user_input + 15;
+
+        if (strlen(input) > 0)
+        {
+            ecrire(sockfd, "messageGlobal", nom, nom, input);
+        }
+        else
+        {
+            // Message d'erreur si aucun contenu n'est fourni
+            afficher_message(COLOR_YELLOW, "Erreur : Le message global est vide. Syntaxe : /messageGlobal <message>\n");
+        }
+    }
     else if (strncmp(user_input, "/message ", 9) == 0)
     {
         char *input = user_input + 9;

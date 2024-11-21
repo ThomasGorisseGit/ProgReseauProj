@@ -71,6 +71,10 @@ void message_handler(Joueur *joueur, char *message)
     {
         commande_classement(joueur, lobby);
     }
+    else if (strcmp(command, "messageGlobal") == 0)
+    {
+        commande_message_global(lobby, expediteur, body);
+    }
     else
     {
         printf("Commande inconnue reçue: %s\n", command);
