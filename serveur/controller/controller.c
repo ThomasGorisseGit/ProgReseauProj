@@ -53,8 +53,8 @@ void message_handler(Joueur *joueur, char *message)
     }
     else if (strcmp(command, "coup") == 0)
     {
-        int case_depart = atoi(body);
-        Jeu *jeu = lobby->jeux[joueur->idPartie];
+        // int case_depart = atoi(body);
+        // Jeu *jeu = lobby->jeux[joueur->idPartie];
         commande_jouerCoup(lobby, joueur, body);
     }
     else if (strcmp(command, "modifierBio") == 0)

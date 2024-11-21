@@ -1,5 +1,28 @@
 #include "awale.h"
-
+void initialiserPlateau(Jeu *jeu)
+{
+    if (jeu->plateau == NULL)
+    {
+        Case *plateau = malloc(sizeof(Case) * 12);
+        jeu->plateau = plateau;
+    }
+    // Initialiser les graines et les propriétaires des cases
+    for (int i = 0; i < 12; i++)
+    {
+        jeu->plateau[i].nbGraines = 4; // 4 graines par case
+    }
+    for (int i = 0; i < 6; i++)
+    {
+        jeu->plateau[i].proprietaire = jeu->joueur1; // Cases 0-5 appartiennent à joueur1
+    }
+    for (int i = 6; i < 12; i++)
+    {
+        jeu->plateau[i].proprietaire = jeu->joueur2; // Cases 6-11 appartiennent à joueur2
+    }
+    // Initialiser les scores des joueurs
+    jeu->joueur1->score = 0;
+    jeu->joueur2->score = 0;
+}
 int verifierCasDarret(Jeu *jeu)
 {
 
