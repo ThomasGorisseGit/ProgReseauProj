@@ -18,5 +18,6 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE]);
 void commande_modifierBio(Joueur *joueur, char body[MAX_BODY_SIZE]);
 void commande_consulterBio(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE]);
 void commande_classement(Joueur *joueur, Lobby *lobby);
+void commande_defier_bot(Lobby *lobby, Joueur *joueur);
 
 #endif // COMMANDES_H

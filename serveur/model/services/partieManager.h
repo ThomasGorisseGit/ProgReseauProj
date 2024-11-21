@@ -13,4 +13,6 @@
 void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur);
 void qui_commence(Jeu *jeu);
 void calculerElo(Joueur *joueur1, Joueur *joueur2, int resultatA);
+void jouerCoupBot(Jeu *jeu);
+
 #endif // PARTIE_MANAGER_H

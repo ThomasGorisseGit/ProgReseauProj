@@ -11,6 +11,11 @@ typedef enum
     PARTIE,
     DEFI
 } Status;
+typedef enum
+{
+    HUMAIN,
+    IA
+} Type;
 typedef struct Joueur
 {
     char *nom;
@@ -21,6 +26,8 @@ typedef struct Joueur
     int idJoueur;
     char *bio;
     double elo;
+    Type type;
+
 } Joueur;
 
 typedef struct Case

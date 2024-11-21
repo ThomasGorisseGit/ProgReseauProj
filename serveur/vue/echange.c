@@ -2,6 +2,10 @@
 #include "echange.h"
 int envoyer_message(Joueur *joueur, char *message)
 {
+    if (joueur->socket == NULL)
+    {
+        return 0;
+    }
     int n;
     n = write(*joueur->socket, message, strlen(message));
     if (n < 0)

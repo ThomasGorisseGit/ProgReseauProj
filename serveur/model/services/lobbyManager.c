@@ -40,6 +40,7 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
     strcpy(joueur->bio, "Ce joueurs n'a pas de bio");
 
     joueur->status = INIT;
+    joueur->type = HUMAIN;
     joueur->idPartie = -1;
     joueur->idJoueur = lobby->nbJoueurs;
     joueur->elo = 1000.0;
