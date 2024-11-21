@@ -12,6 +12,5 @@
 
 // verifier le format d'un message
 int verifierFormatMessage(char *message, char *command, char *destinataire, char *expediteur, char *body);
-int check_if_message(Lobby *lobby, fd_set *readfds);
 
 #endif // messageManager_h
