@@ -1,11 +1,15 @@
 #include "awale.h"
 void initialiserPlateau(Jeu *jeu)
 {
+    printf("If plateau is null\n");
     if (jeu->plateau == NULL)
     {
+        printf("init des cases\n");
+
         Case *plateau = malloc(sizeof(Case) * 12);
         jeu->plateau = plateau;
     }
+    printf("init des valeurs\n");
     // Initialiser les graines et les propriétaires des cases
     for (int i = 0; i < 12; i++)
     {

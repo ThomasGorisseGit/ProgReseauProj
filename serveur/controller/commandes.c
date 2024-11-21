@@ -91,15 +91,17 @@ void commande_declinerDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
 
 void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINATAIRE_SIZE])
 {
+    printf("Recherche joueur");
     Joueur *demandeur = trouver_joueur(lobby, destinataire);
     if (demandeur == NULL)
     {
         envoyer_erreur(joueur, "Le joueur n'existe pas ou n'est pas connecté"); // Le joueur %s n'existe pas ou n'est pas connecté.
     }
+    printf("Joueur trouvé%s", demandeur->nom);
     envoyer_accepter_defi(joueur, demandeur);
     usleep(2000);
 
-    // Initialiser la partie
+    // // Initialiser la partie
     initialiser_jeu(lobby, demandeur, joueur);
 
     Jeu *jeu = lobby->jeux[joueur->idPartie];

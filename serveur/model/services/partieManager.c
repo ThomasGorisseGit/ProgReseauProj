@@ -18,8 +18,10 @@ void qui_commence(Jeu *jeu)
 
 void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
 {
+    printf("debut Modif status\n");
     demandeur->status = PARTIE;
     joueur->status = PARTIE;
+    printf("fin Modif status\n");
 
     // Initialiser la partie
     Jeu *jeu = malloc(sizeof(Jeu));
@@ -28,9 +30,12 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
         perror("Erreur d'allocation mémoire pour le jeu");
         exit(EXIT_FAILURE);
     }
+    printf("debut jeu\n");
 
     jeu->joueur1 = demandeur;
     jeu->joueur2 = joueur;
+    jeu->plateau = NULL;
+    jeu->vainqueur = NULL;
 
     if (jeu->joueur1 == NULL || jeu->joueur2 == NULL)
     {
@@ -38,8 +43,10 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
         free(jeu);
         exit(EXIT_FAILURE);
     }
+    printf("init plateau\n");
 
     initialiserPlateau(jeu);
+    printf("fin init plateau\n");
 
     if (lobby->nbJeux >= MAX_PARTIES)
     {
@@ -47,12 +54,15 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
         free(jeu);
         exit(EXIT_FAILURE);
     }
-
+    printf("debut idPartie\n");
     joueur->idPartie = lobby->nbJeux;
     demandeur->idPartie = lobby->nbJeux;
+    printf("fin idPartie\n");
 
+    printf("debut ajout jeu\n");
     lobby->jeux[lobby->nbJeux] = jeu;
     lobby->nbJeux++;
+    printf("fin ajout jeu\n");
     srand(time(NULL));
     qui_commence(jeu);
 }
