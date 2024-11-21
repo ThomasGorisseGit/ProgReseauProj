@@ -26,7 +26,6 @@ void envoyer_a_tous(Lobby *lobby, char *message)
     {
         if (lobby->joueurs[i]->status == LOBBY)
         {
-            printf("Envoie vers %s\n  %s", lobby->joueurs[i]->nom, message);
             envoyer_message(lobby->joueurs[i], message);
         }
     }
@@ -226,6 +225,26 @@ void envoyer_rejoindre(Joueur *joueur, Lobby *lobby)
     snprintf(message, sizeof(message), "/rejoindre #server #%s Un nouveau joueur a rejoint le lobby : %s%s%s\n", joueur->nom, COLOR_GREEN, joueur->nom, COLOR_RESET);
     envoyer_a_tous(lobby, message);
 }
+
+void envoyer_message_global(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE])
+{
+    for (int i = 0; i < lobby->nbJoueurs; i++)
+    {
+        Joueur *destinataire = lobby->joueurs[i];
+        if (destinataire != NULL && destinataire->status == LOBBY && destinataire != joueur)
+        {
+            char message[MAX_MESSAGE_SIZE];
+            snprintf(message, sizeof(message),
+                     "/messageGlobal #server #%s Message de %s%s%s : %s%s%s\n",
+                     joueur->nom,
+                     COLOR_GREEN, joueur->nom, COLOR_RESET,
+                     COLOR_BLUE, body, COLOR_RESET);
+
+            envoyer_message(destinataire, message);
+        }
+    }
+}
+
 void envoyer_decliner_defi(Joueur *joueur, Joueur *demandeur)
 {
     char message[MAX_MESSAGE_SIZE];

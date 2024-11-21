@@ -11,6 +11,7 @@
 // Envoyer erreur
 int envoyer_erreur(Joueur *joueur, char erreur[MAX_BODY_SIZE]);
 int envoyer_message(Joueur *joueur, char *message);
+void envoyer_message_global(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE]);
 void envoyer_le_joueur_courant(Jeu *jeu);
 void demander_case_depart(Joueur *joueur);
 void envoyer_gagnant(Jeu *jeu);
