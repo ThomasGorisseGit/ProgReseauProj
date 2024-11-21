@@ -41,7 +41,7 @@ void commande_defier(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINA
     Joueur *defie = defier_joueur(lobby, destinataire);
     if (strcmp(joueur->nom, destinataire) == 0)
     {
-        envoyer_erreur(joueur); // Vous ne pouvez pas vous défier vous-même.
+        envoyer_erreur(joueur, "Vous ne pouvez pas vous défier vous même !"); // Vous ne pouvez pas vous défier vous-même.
     }
     else if (defie != NULL)
     {
@@ -51,7 +51,7 @@ void commande_defier(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINA
     }
     else
     {
-        envoyer_erreur(joueur); // Le joueur %s n'est pas disponible pour un défi.
+        envoyer_erreur(joueur, "Le joueur n'est pas disponible pour un défi"); // Le joueur %s n'est pas disponible pour un défi.
     }
 }
 
@@ -60,7 +60,7 @@ void commande_declinerDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
     Joueur *demandeur = trouver_joueur(lobby, destinataire);
     if (demandeur == NULL)
     {
-        envoyer_erreur(joueur);
+        envoyer_erreur(joueur, "Le joueur n'existe pas ou n'est pas connecté."); // Le joueur %s n'existe pas ou n'est pas connecté.
     }
     else
     {
@@ -75,7 +75,7 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
     Joueur *demandeur = trouver_joueur(lobby, destinataire);
     if (demandeur == NULL)
     {
-        envoyer_erreur(joueur); // Le joueur %s n'existe pas ou n'est pas connecté.
+        envoyer_erreur(joueur, "Le joueur n'existe pas ou n'est pas connecté"); // Le joueur %s n'existe pas ou n'est pas connecté.
     }
     envoyer_accepter_defi(joueur, demandeur);
     usleep(2000);
@@ -113,19 +113,19 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
     if (joueur->idPartie == -1)
     {
         printf("erreur id partie");
-        envoyer_erreur(joueur);
+        envoyer_erreur(joueur, "Erreur lors de la récupération de l'id de la partie");
         return;
     }
     if (joueur->status != PARTIE)
     {
         printf("erreur not in partie");
-        envoyer_erreur(joueur);
+        envoyer_erreur(joueur, "Vous n'êtes pas en partie");
         return;
     }
     if (jeu->current->nom != joueur->nom)
     {
         printf("Ce n'est pas a ce joueur de jouer");
-        envoyer_erreur(joueur);
+        envoyer_erreur(joueur, "Ce n'est pas à vous de jouer");
         return;
     }
     printf("TEST JOUER COUP");
@@ -135,7 +135,7 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
     if (coups_valide == -1)
     {
         // Le coups est invalide, on redemande a l'utilisateur
-        envoyer_erreur(joueur);
+        envoyer_erreur(joueur, "Coup invalide, veuillez rejouer");
         usleep(2000);
 
         demander_case_depart(joueur);
@@ -208,7 +208,7 @@ void commande_consulterBio(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE
     Joueur *j = trouver_joueur(lobby, body);
     if (j == NULL)
     {
-        envoyer_erreur(joueur);
+        envoyer_erreur(joueur, "Le joueur n'existe pas ou n'est pas connecté");
     }
     else
     {

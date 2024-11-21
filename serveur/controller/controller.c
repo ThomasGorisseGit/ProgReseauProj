@@ -19,7 +19,7 @@ void message_handler(Joueur *joueur, char *message)
     int valid_message = verifierFormatMessage(message, command, expediteur, destinataire, body);
     if (!valid_message)
     {
-        envoyer_erreur(joueur);
+        envoyer_erreur(joueur, "Message invalide");
         return;
     }
     if (strcmp(command, "nom") == 0)
