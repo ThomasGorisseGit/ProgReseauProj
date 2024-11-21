@@ -14,5 +14,5 @@ char *afficherPlateau(Jeu *jeu);
 int verifierCasDarret(Jeu *jeu);
 void calculerScore(Jeu *jeu, int caseFin);
 int jouerCoup(Jeu *jeu, int caseDepart);
-
+int getCaseDepart(Jeu *jeu);
 #endif // AWALE_H

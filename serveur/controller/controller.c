@@ -36,6 +36,10 @@ void message_handler(Joueur *joueur, char *message)
     {
         commande_defier(lobby, joueur, destinataire);
     }
+    else if (strcmp(command, "defierIA") == 0)
+    {
+        commande_defierIA(lobby, joueur);
+    }
 
     else if (strcmp(command, "declinerDefi") == 0)
     {

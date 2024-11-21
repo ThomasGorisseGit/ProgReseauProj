@@ -219,3 +219,46 @@ void commande_classement(Joueur *joueur, Lobby *lobby)
 {
     envoyer_classement(lobby, joueur);
 }
+void commande_defierIA(Lobby *lobby, Joueur *joueur)
+{
+    Joueur *IA = malloc(sizeof(Joueur));
+    IA->nom = "IA";
+    IA->bio = "Je suis une IA";
+    IA->status = DEFI;
+    IA->idPartie = -1;
+    IA->idJoueur = lobby->nbJoueurs;
+    IA->elo = 1000.0;
+    IA->score = 0;
+    // Initialiser la partie
+    initialiser_jeu(lobby, IA, joueur);
+
+    Jeu *jeu = lobby->jeux[joueur->idPartie];
+    if (jeu == NULL)
+    {
+        perror("Erreur d'allocation mémoire pour le jeu");
+        exit(1);
+    }
+
+    // récupération du plateau de jeu
+    // char *string_plateau = afficherPlateau(jeu);
+    envoyer_plateau(jeu);
+    usleep(2000);
+
+    envoyer_le_joueur_courant(jeu);
+    usleep(2000);
+    if (jeu->current->nom == "IA")
+    {
+        int case_depart = getCaseDepart(jeu);
+        jouerCoup(jeu, case_depart);
+        usleep(2000);
+        envoyer_plateau(jeu);
+        usleep(2000);
+        envoyer_le_joueur_courant(jeu);
+        usleep(2000);
+        demander_case_depart(jeu->current);
+    }
+    else
+    {
+        demander_case_depart(jeu->current);
+    }
+}

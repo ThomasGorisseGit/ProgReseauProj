@@ -189,3 +189,24 @@ int jouerCoup(Jeu *jeu, int caseDepart)
     afficherFin(&plateau,vainqueur);
     return 0;
 }*/
+int getCaseDepart(Jeu *jeu)
+{
+    printf("DEBUT JOUER COUP IA");
+    if (jeu->current->nom != "IA")
+    {
+        return -1;
+    }
+
+    if (jeu->joueur1->nom == "IA")
+    {
+        int caseDepart = rand() % 6;
+        printf("FIN JOUER COUP IA");
+        return caseDepart;
+    }
+    if (jeu->joueur2->nom == "IA")
+    {
+        int caseDepart = rand() % 6 + 6;
+        printf("FIN JOUER COUP IA");
+        return caseDepart;
+    }
+}
