@@ -109,8 +109,6 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
         exit(1);
     }
 
-    // récupération du plateau de jeu
-    // char *string_plateau = afficherPlateau(jeu);
     envoyer_plateau(jeu);
     usleep(2000);
 
