@@ -26,64 +26,6 @@ void initialiserPlateau(Jeu *jeu)
     jeu->joueur1->score = 0;
     jeu->joueur2->score = 0;
 }
-
-char *afficherPlateau(Jeu *jeu)
-{
-
-    // Taille fixe pour éviter les erreurs de dépassement
-    char buffer[5000];
-    int pos = 0; // Position actuelle dans le buffer
-
-    // Informations sur le joueur 1
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "Joueur 1 : %s\nScore : %d\n\n",
-                    jeu->joueur1->nom, jeu->joueur1->score);
-
-    // Informations sur le joueur 2
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "Joueur 2 : %s\nScore : %d\n\n",
-                    jeu->joueur2->nom, jeu->joueur2->score);
-
-    // Rangée supérieure : indices
-    for (int i = 0; i < 6; i++)
-    {
-        pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  %d  ", i);
-    }
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
-
-    // Rangée supérieure : graines
-    for (int i = 0; i < 6; i++)
-    {
-        pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  %d  ", jeu->plateau[i].nbGraines);
-    }
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
-
-    // Ligne de séparation
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "-------------------------------\n");
-
-    // Rangée inférieure : indices
-    for (int i = 11; i > 5; i--)
-    {
-        pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  %d  ", i);
-    }
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
-
-    // Rangée inférieure : graines
-    for (int i = 11; i > 5; i--)
-    {
-        pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  %d  ", jeu->plateau[i].nbGraines);
-    }
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
-
-    // Allouer dynamiquement la chaîne finale
-    char *result = strdup(buffer);
-    if (result == NULL)
-    {
-        perror("Erreur d'allocation mémoire pour le plateau");
-        exit(EXIT_FAILURE);
-    }
-
-    return result;
-}
-
 int verifierCasDarret(Jeu *jeu)
 {
 
@@ -147,37 +89,3 @@ int jouerCoup(Jeu *jeu, int caseDepart)
 
     return verifierCasDarret(jeu);
 }
-
-/*int main(){
-    Plateau plateau;
-    Joueur joueur1;
-    joueur1.nom="Joueur 1";
-    Joueur joueur2;
-    joueur2.nom="Joueur 2";
-    plateau.joueur1=&joueur1;
-    plateau.joueur2=&joueur2;
-    initialiserPlateau(&plateau);
-    afficherPlateau(&plateau);
-    Joueur* vainqueur=NULL;
-    while(vainqueur==NULL){
-        int caseDepart;
-        do{
-            printf("Joueur 1, entrez la case de départ : ");
-            scanf("%d",&caseDepart);
-            vainqueur=jouerCoup(&plateau,caseDepart, &joueur1);
-        } while(vainqueur==-1);
-        afficherPlateau(&plateau);
-        if(vainqueur!=NULL){
-            break;
-        }
-        printf("____________________________________________________\n \n");
-        do{
-            printf("Joueur 2, entrez la case de départ : ");
-            scanf("%d",&caseDepart);
-            vainqueur=jouerCoup(&plateau,caseDepart, &joueur2);
-        } while(vainqueur==-1 );
-        afficherPlateau(&plateau);
-    }
-    afficherFin(&plateau,vainqueur);
-    return 0;
-}*/

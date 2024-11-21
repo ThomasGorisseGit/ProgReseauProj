@@ -64,60 +64,108 @@ void envoyer_egalite(Jeu *jeu)
 }
 void envoyer_plateau(Jeu *jeu)
 {
+    char buffer_joueur1[MAX_BODY_SIZE];
+    char buffer_joueur2[MAX_BODY_SIZE];
 
-    char buffer[MAX_BODY_SIZE];
-    int pos = 0;
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "%sJoueur 2 :%s %s\n%sScore :%s %d\n\n",
-                    COLOR_GREEN, COLOR_RESET,
-                    jeu->joueur2->nom,
-                    COLOR_GREEN, COLOR_RESET,
-                    jeu->joueur2->score);
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ");
-    for (int i = 6; i < 12; i++)
+    // Plateau pour le joueur 1
+    int pos1 = 0;
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "%sJoueur 1 :%s %s\n%sScore :%s %d\n\n",
+                     COLOR_GREEN, COLOR_RESET,
+                     jeu->joueur1->nom,
+                     COLOR_GREEN, COLOR_RESET,
+                     jeu->joueur1->score);
+
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "  ");
+    for (int i = 11; i >= 6; i--)
     {
-        pos += snprintf(buffer + pos, sizeof(buffer) - pos, " %2d  ", i);
+        pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, " %2d  ", i);
     }
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "\n");
 
-    // Rangée supérieure : graines
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ");
-    for (int i = 6; i < 12; i++)
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "  ");
+    for (int i = 11; i >= 6; i--)
     {
-        pos += snprintf(buffer + pos, sizeof(buffer) - pos, " %2d  ", jeu->plateau[i].nbGraines);
+        pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, " %2d  ", jeu->plateau[i].nbGraines);
     }
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "\n");
 
-    // Ligne de séparation
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ----------------------------\n");
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "  ----------------------------\n");
 
-    // Rangée inférieure : indices (0 à 5)
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ");
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "  ");
+    for (int i = 0; i < 6; i++)
+    {
+        pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, " %2d  ", i);
+    }
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "\n");
+
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "  ");
+    for (int i = 0; i < 6; i++)
+    {
+        pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, " %2d  ", jeu->plateau[i].nbGraines);
+    }
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "\n\n");
+
+    pos1 += snprintf(buffer_joueur1 + pos1, sizeof(buffer_joueur1) - pos1, "%sJoueur 2 :%s %s\n%sScore :%s %d\n",
+                     COLOR_GREEN, COLOR_RESET,
+                     jeu->joueur2->nom,
+                     COLOR_GREEN, COLOR_RESET,
+                     jeu->joueur2->score);
+
+    // Plateau pour le joueur 2
+    int pos2 = 0;
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "%sJoueur 2 :%s %s\n%sScore :%s %d\n\n",
+                     COLOR_GREEN, COLOR_RESET,
+                     jeu->joueur2->nom,
+                     COLOR_GREEN, COLOR_RESET,
+                     jeu->joueur2->score);
+
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "  ");
     for (int i = 5; i >= 0; i--)
     {
-        pos += snprintf(buffer + pos, sizeof(buffer) - pos, " %2d  ", i);
+        pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, " %2d  ", i);
     }
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n");
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "\n");
 
-    // Rangée inférieure : graines
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "  ");
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "  ");
     for (int i = 5; i >= 0; i--)
     {
-        pos += snprintf(buffer + pos, sizeof(buffer) - pos, " %2d  ", jeu->plateau[i].nbGraines);
+        pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, " %2d  ", jeu->plateau[i].nbGraines);
     }
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "\n\n");
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "\n");
 
-    // Informations sur le joueur 1
-    pos += snprintf(buffer + pos, sizeof(buffer) - pos, "%sJoueur 1 :%s %s\n%sScore :%s %d\n",
-                    COLOR_GREEN, COLOR_RESET,
-                    jeu->joueur1->nom,
-                    COLOR_GREEN, COLOR_RESET,
-                    jeu->joueur1->score);
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "  ----------------------------\n");
 
-    char message[MAX_MESSAGE_SIZE];
-    snprintf(message, sizeof(message), "/message #server #%s %s", jeu->joueur1->nom, buffer);
-    envoyer_message(jeu->joueur1, message);
-    envoyer_message(jeu->joueur2, message);
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "  ");
+    for (int i = 6; i < 12; i++)
+    {
+        pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, " %2d  ", i);
+    }
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "\n");
+
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "  ");
+    for (int i = 6; i < 12; i++)
+    {
+        pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, " %2d  ", jeu->plateau[i].nbGraines);
+    }
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "\n\n");
+
+    pos2 += snprintf(buffer_joueur2 + pos2, sizeof(buffer_joueur2) - pos2, "%sJoueur 1 :%s %s\n%sScore :%s %d\n",
+                     COLOR_GREEN, COLOR_RESET,
+                     jeu->joueur1->nom,
+                     COLOR_GREEN, COLOR_RESET,
+                     jeu->joueur1->score);
+
+    // Envoi des messages
+    char message1[MAX_MESSAGE_SIZE];
+    char message2[MAX_MESSAGE_SIZE];
+
+    snprintf(message1, sizeof(message1), "/message #server #%s %s", jeu->joueur1->nom, buffer_joueur1);
+    snprintf(message2, sizeof(message2), "/message #server #%s %s", jeu->joueur2->nom, buffer_joueur2);
+
+    envoyer_message(jeu->joueur1, message1);
+    envoyer_message(jeu->joueur2, message2);
 }
+
 void envoyer_liste_joueurs(Lobby *lobby, Joueur *joueur)
 {
     char *header = "Pseudo\t\t | \tStatus\n";
