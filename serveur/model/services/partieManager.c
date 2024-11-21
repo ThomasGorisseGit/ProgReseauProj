@@ -3,7 +3,7 @@ void qui_commence(Jeu *jeu)
 {
     int nombreAleatoire = (rand() % 2) + 1;
     printf("\033[31m"
-           "Le nombre généré est %d\n", // Remplacement par %d pour un entier
+           "Le nombre généré est %d\n\033[0m", // Remplacement par %d pour un entier
            nombreAleatoire);
 
     if (nombreAleatoire == 1)

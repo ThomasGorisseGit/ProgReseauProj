@@ -16,5 +16,6 @@
 
 void afficher_guide();
 void afficher_message(char *color, char message[MAX_MESSAGE_SIZE]);
+void afficher_message_nocolour(char message[MAX_BODY_SIZE]);
 
 #endif // DISPLAY_H

@@ -61,7 +61,7 @@ void message_handler(Joueur *joueur, char *message)
         printf("Case départ : %d\n", case_depart);
         Jeu *jeu = lobby->jeux[joueur->idPartie];
         printf("Jeu : %s\n", jeu->current->nom);
-        printf("winner: %p", jeu->vainqueur);
+        // printf("winner: %p", jeu->vainqueur);
         commande_jouerCoup(lobby, joueur, body);
     }
     else if (strcmp(command, "modifierBio") == 0)
