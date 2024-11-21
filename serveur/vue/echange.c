@@ -13,10 +13,10 @@ int envoyer_message(Joueur *joueur, char *message)
     return n;
 }
 
-int envoyer_erreur(Joueur *joueur)
+int envoyer_erreur(Joueur *joueur, char erreur[MAX_BODY_SIZE])
 {
     char message[MAX_MESSAGE_SIZE];
-    snprintf(message, sizeof(message), "/message #server #%s %sErreur :%s %sLe joueur n'existe pas ou n'est pas connecté.%s", joueur->nom, COLOR_RED_BOLD, COLOR_RESET, COLOR_RED, COLOR_RESET);
+    snprintf(message, sizeof(message), "/message #server #%s %sErreur :%s\n %s%s%s", joueur->nom, COLOR_RED_BOLD, COLOR_RESET, COLOR_RED, erreur, COLOR_RESET);
     return envoyer_message(joueur, message);
 }
 
@@ -262,29 +262,27 @@ void envoyer_elo_joueurs(Jeu *jeu)
     snprintf(message, sizeof(message), "/message #server #%s Votre ELO est de %s%f%s", jeu->joueur2->nom, COLOR_BLUE, jeu->joueur2->elo, COLOR_RESET);
     envoyer_message(jeu->joueur2, message);
 }
+
 void envoyer_classement(Lobby *lobby, Joueur *joueur)
 {
-    int totalLength = strlen("Classement des joueurs :\n");
-    for (int i = 0; i < lobby->nbJoueurs; i++)
-    {
-        totalLength += strlen(lobby->joueurs[i]->nom) + 1; // +1 pour le saut de ligne
-    }
-    char *message = malloc(totalLength * sizeof(char));
+    char buffer[MAX_BODY_SIZE];
+    int pos = 0;
 
-    strcpy(message, "Pseudo\t\t\t | \t\tELO\n");
-    message = strcat(message, "-------------------------|-------------------------\n");
-    for (int i = 0; i < lobby->nbJoueurs; i++)
+    // Ajout du header
+    pos += snprintf(buffer + pos, MAX_BODY_SIZE - pos, "%sPseudo%s\t\t\t | \t\t%sELO%s\n", COLOR_BLUE, COLOR_RESET, COLOR_BLUE, COLOR_RESET);
+    pos += snprintf(buffer + pos, MAX_BODY_SIZE - pos, "-------------------------|-------------------------\n");
+
+    // Ajout des joueurs et de leur ELO
+    for (int i = 0; i < lobby->nbJoueurs && pos < MAX_BODY_SIZE; i++)
     {
-        message = strcat(message, lobby->joueurs[i]->nom);
-        message = strcat(message, "\t\t\t | \t\t");
-        char elo[10];
-        snprintf(elo, sizeof(elo), "%f", lobby->joueurs[i]->elo);
-        message = strcat(message, elo);
-        message = strcat(message, "\n");
+        pos += snprintf(buffer + pos, MAX_BODY_SIZE - pos, "%s\t\t\t | \t\t%.2f\n",
+                        lobby->joueurs[i]->nom, lobby->joueurs[i]->elo);
     }
 
     char messageToSend[MAX_MESSAGE_SIZE];
-    snprintf(messageToSend, sizeof(messageToSend), "/classement #server #%s Classement des joueurs : \n%s", joueur->nom, message);
+    snprintf(messageToSend, sizeof(messageToSend), "/message #server #%s %sClassement des joueurs :%s \n%s", joueur->nom, COLOR_YELLOW, COLOR_RESET, buffer);
+
+    // Envoi du message
     envoyer_message(joueur, messageToSend);
 }
 void envoyer_nom_valide(Joueur *joueur)
