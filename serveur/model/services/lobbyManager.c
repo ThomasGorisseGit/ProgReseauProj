@@ -32,12 +32,18 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
 
     Joueur *joueur = malloc(sizeof(Joueur));
     joueur->socket = newsockfd;
-    joueur->nom = malloc(MAX_NAME_SIZE * sizeof(char));
 
+    joueur->nom = malloc(MAX_NAME_SIZE * sizeof(char));
     strcpy(joueur->nom, "Anonyme");
+
+    joueur->bio = malloc(MAX_NAME_SIZE * sizeof(char));
+    strcpy(joueur->bio, "Ce joueurs n'a pas de bio");
+
     joueur->status = INIT;
     joueur->idPartie = -1;
     joueur->idJoueur = lobby->nbJoueurs;
+    joueur->elo = 1000.0;
+    joueur->score = 0;
 
     // Ajouter le nouveau joueur au lobby
     lobby->joueurs[lobby->nbJoueurs] = joueur;
@@ -56,9 +62,8 @@ void fin_partie(Jeu *jeu)
 
     jeu->joueur1->idPartie = -1;
     jeu->joueur2->idPartie = -1;
-
-    free(jeu);
-    jeu = NULL;
+    // free(jeu->plateau);
+    // free(jeu);
 }
 
 Joueur *trouver_joueur(Lobby *lobby, const char *nom)

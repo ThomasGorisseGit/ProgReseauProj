@@ -1,6 +1,13 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+#define COLOR_RESET "\033[0m"
+#define COLOR_RED "\033[31m"
+#define COLOR_GREEN "\033[32m"
+#define COLOR_YELLOW "\033[33m"
+#define COLOR_BLUE "\033[34m"
+#define COLOR_RED_BOLD "\033[1;31m"
+
 #define MAX_PLAYER 10
 #define MAX_PARTIES 5
 #define MAX_NAME_SIZE 50
@@ -9,4 +16,5 @@
 #define MAX_BODY_SIZE 2000
 #define MAX_MESSAGE_SIZE 2150
 
+#define FACTEUR_DAJUSTEMENT_ELO 32
 #endif // CONSTANTS_H

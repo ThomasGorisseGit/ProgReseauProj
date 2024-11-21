@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS =
+CFLAGS = -Wall
 BIN_DIR = bin
 
 # Création des exécutables

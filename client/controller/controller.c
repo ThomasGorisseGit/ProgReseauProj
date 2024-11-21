@@ -9,17 +9,18 @@ void handle_server_message(char *message, int *sockfd)
     {
         if (strcmp(command, "rejoindre") == 0)
         {
-            afficher_message(COLOR_GREEN, body);
+            afficher_message_nocolour(body);
         }
         else if (strcmp(command, "defier") == 0)
         {
             char formatted_message[MAX_MESSAGE_SIZE];
             snprintf(formatted_message, sizeof(formatted_message), "Défi reçu de %s : %s", expediteur, body);
-            afficher_message(COLOR_RED, formatted_message);
+            // afficher_message(COLOR_RED, formatted_message);
+            afficher_message_nocolour(formatted_message);
 
             // Demande de réponse utilisateur
             char response[10];
-            afficher_message(COLOR_RESET, "Accepter le défi ? (1 pour oui, 0 pour non) : ");
+            // afficher_message(COLOR_RESET, "Accepter le défi ? (1 pour oui, 0 pour non) : ");
             fgets(response, sizeof(response), stdin);
             response[strcspn(response, "\n")] = '\0';
 
@@ -30,15 +31,15 @@ void handle_server_message(char *message, int *sockfd)
         }
         else if (strcmp(command, "listeJoueurs") == 0)
         {
-            char formatted_message[MAX_MESSAGE_SIZE];
-            snprintf(formatted_message, sizeof(formatted_message), "La liste des joueurs disponibles : %s", body);
-            afficher_message(COLOR_BLUE, formatted_message);
+            // afficher_message(COLOR_BLUE, body);
+            afficher_message_nocolour(body);
         }
         else if (strcmp(command, "message") == 0)
         {
             char formatted_message[MAX_MESSAGE_SIZE];
-            snprintf(formatted_message, sizeof(formatted_message), "Message de %s : %s", expediteur, body);
-            afficher_message(COLOR_BLUE, formatted_message);
+            snprintf(formatted_message, sizeof(formatted_message), "Message de %s : \n%s", expediteur, body);
+            // afficher_message(COLOR_RED, formatted_message);
+            afficher_message_nocolour(formatted_message);
         }
         else if (strcmp(command, "case") == 0)
         {
@@ -54,6 +55,10 @@ void handle_server_message(char *message, int *sockfd)
         else if (strcmp(command, "nomInvalide") == 0)
         {
             afficher_message(COLOR_RED, body);
+        }
+        else if (strcmp(command, "classement") == 0)
+        {
+            afficher_message(COLOR_BLUE, body);
         }
         else
         {
@@ -81,6 +86,20 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
     else if (strcmp(user_input, "/aide") == 0)
     {
         afficher_guide();
+    }
+    else if (strncmp(user_input, "/modifierBio ", 13) == 0)
+    {
+        char *bio = user_input + 13;
+        ecrire(sockfd, "modifierBio", nom, "server", bio);
+    }
+    else if (strncmp(user_input, "/consulterBio ", 14) == 0)
+    {
+        char *user = user_input + 14;
+        ecrire(sockfd, "consulterBio", nom, "server", user);
+    }
+    else if (strcmp(user_input, "/classement") == 0)
+    {
+        ecrire(sockfd, "classement", nom, "server", "");
     }
     else if (strncmp(user_input, "/message ", 9) == 0)
     {
@@ -186,7 +205,9 @@ void event_loop(int sockfd, char *nom)
 
 char *register_user(int sockfd)
 {
-    afficher_message(COLOR_BLUE, "Entrez votre nom :");
+
+    // afficher_message(COLOR_BLUE, "Entrez votre nom :");
+    afficher_message_nocolour("Entrez votre nom :");
     char *nom = lireInput();
     ecrire(&sockfd, "nom", nom, "server", nom);
 
