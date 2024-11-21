@@ -48,7 +48,7 @@ void commande_message(char destinataire[MAX_DESTINATAIRE_SIZE], char expediteur[
     {
         // Send an error message back to the sender if the recipient does not exist
         char error_msg[MAX_MESSAGE_SIZE];
-        snprintf(error_msg, sizeof(error_msg), "/message #server #%s Le joueur %s n'existe pas ou n'est pas connecté.", expediteur, destinataire);
+        snprintf(error_msg, sizeof(error_msg), "/message #server #%s Le joueur %s n'existe pas ou n'est pas disponible.", expediteur, destinataire);
         Joueur *j_expediteur = trouver_joueur(lobby, expediteur);
         envoyer_message(j_expediteur, error_msg);
         printf("Erreur : Le joueur %s n'existe pas ou n'est pas connecté.\n", destinataire);
@@ -122,13 +122,8 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
 
 void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
 {
-    printf("DEBUT COMMANDE JOUER COUP");
-    printf("BODY : %s", body);
-    printf("case : %d", atoi(body));
     int case_depart = atoi(body);
-    printf("CASE DEPART : %d", case_depart);
     Jeu *jeu = lobby->jeux[joueur->idPartie];
-    printf("ID JEU %d", joueur->idPartie);
     if (joueur->idPartie == -1)
     {
         printf("erreur id partie");
@@ -147,10 +142,7 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         envoyer_erreur(joueur);
         return;
     }
-    printf("TEST JOUER COUP");
     int coups_valide = jouerCoup(jeu, case_depart);
-    printf("COUP : %d", coups_valide);
-    printf("TEST COUP INVALIDE");
     if (coups_valide == -1)
     {
         // Le coups est invalide, on redemande a l'utilisateur
@@ -160,7 +152,6 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         demander_case_depart(joueur);
         return;
     }
-    printf("TEST EGALITE");
     if (coups_valide == 0)
     {
         // égalité
@@ -171,12 +162,10 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         return;
     }
 
-    printf("TEST VAINQUEUR");
     if (jeu->vainqueur != NULL && (jeu->vainqueur->nom == jeu->joueur1->nom || jeu->vainqueur->nom == jeu->joueur2->nom))
     {
         // On a un vainqueur
-        printf("ON A UN VAINQUEUR");
-        printf("%s", jeu->vainqueur->nom);
+        printf("Vainqueur : %s", jeu->vainqueur->nom);
         envoyer_gagnant(jeu);
         usleep(2000);
 
@@ -189,16 +178,11 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         fin_partie(jeu);
         return;
     }
-    printf("TEST CONTINUER");
     if (coups_valide == 1)
     {
-        // on continue la partie :
-        // char *string_plateau = malloc(sizeof(char) * 2048);
-        // string_plateau = afficherPlateau(jeu);
-        printf("AFFICHAGE PLATEAU ET ENVOIE");
+
         envoyer_plateau(jeu);
         usleep(2000);
-        printf("CHANGEMENT JOUEUR");
         if (jeu->current == jeu->joueur1)
         {
             jeu->current = jeu->joueur2;
@@ -207,13 +191,10 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         {
             jeu->current = jeu->joueur1;
         }
-        printf("ENVOIE JOUEUR COURANT");
         envoyer_le_joueur_courant(jeu);
         usleep(2000);
-        printf("DEMANDER CASE DEPART");
         demander_case_depart(jeu->current);
     }
-    printf("FIN DU COUP %p", jeu->vainqueur);
 }
 
 void commande_modifierBio(Joueur *joueur, char body[MAX_BODY_SIZE])

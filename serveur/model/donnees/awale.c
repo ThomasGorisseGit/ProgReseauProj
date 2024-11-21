@@ -29,7 +29,6 @@ void initialiserPlateau(Jeu *jeu)
 
 char *afficherPlateau(Jeu *jeu)
 {
-    printf("DEBUT AFFICHER PLATEAU");
 
     // Taille fixe pour éviter les erreurs de dépassement
     char buffer[5000];
@@ -81,14 +80,12 @@ char *afficherPlateau(Jeu *jeu)
         perror("Erreur d'allocation mémoire pour le plateau");
         exit(EXIT_FAILURE);
     }
-    printf("FIN AFFICHER PLATEAU");
 
     return result;
 }
 
 int verifierCasDarret(Jeu *jeu)
 {
-    printf("DEBUT VERIF CAS DARRET");
 
     // Si un joueur a un score de 25 ou plus, il gagne
 
@@ -106,7 +103,6 @@ int verifierCasDarret(Jeu *jeu)
     {
         return 0;
     }
-    printf("FIN VERIF CAS DARRET");
 
     return 1;
 }
@@ -114,18 +110,15 @@ void calculerScore(Jeu *jeu, int caseFin)
 {
     // si on a 2 ou 3 graines dans une case on les prend
     // 4 6 3 11
-    printf("DEBUT CALCUL SCORE");
     while ((jeu->plateau[caseFin].nbGraines == 2 || jeu->plateau[caseFin].nbGraines == 3) && jeu->plateau[caseFin].proprietaire != jeu->current)
     {
         jeu->current->score += jeu->plateau[caseFin].nbGraines;
         jeu->plateau[caseFin].nbGraines = 0;
         caseFin--;
     }
-    printf("FIN CALCUL SCORE");
 }
 int jouerCoup(Jeu *jeu, int caseDepart)
 {
-    printf("DEBUT JOUER COUP");
 
     if (jeu->plateau[caseDepart].proprietaire == jeu->current)
     {
@@ -151,7 +144,6 @@ int jouerCoup(Jeu *jeu, int caseDepart)
     {
         return -1;
     }
-    printf("FIN JOUER COUP");
 
     return verifierCasDarret(jeu);
 }
