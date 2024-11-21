@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <sys/select.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <errno.h>
 
 #include "../model/donnees/constants.h"
 #include "../model/services/lobbyManager.h"
@@ -75,7 +77,7 @@ void message_handler(Joueur *joueur, char *message)
     }
 }
 
-int check_if_message(Lobby *lobby, fd_set *readfds)
+int check_if_message(Lobby *lobby, fd_set *readfds, fd_set *masterfds)
 {
     for (int i = 0; i < lobby->nbJoueurs; i++)
     {
@@ -95,7 +97,7 @@ int check_if_message(Lobby *lobby, fd_set *readfds)
             {
                 printf("Client déconnecté\n");
                 close(*joueur->socket);
-                FD_CLR(*joueur->socket, readfds);
+                FD_CLR(*joueur->socket, masterfds);
                 free(joueur->nom);
                 free(joueur);
                 lobby->joueurs[i] = lobby->joueurs[--lobby->nbJoueurs];
@@ -111,13 +113,13 @@ int check_if_message(Lobby *lobby, fd_set *readfds)
 
     return 0;
 }
-
 int main(int argc, char **argv)
 {
     int sockfd;
     struct sockaddr_in serv_addr;
-    fd_set readfds;
+    fd_set readfds, masterfds;
     int max_fd;
+
     if (argc != 2)
     {
         printf("usage: socket_server port\n");
@@ -127,7 +129,7 @@ int main(int argc, char **argv)
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
     {
-        printf("impossible d'ouvrir le socket\n");
+        perror("Impossible d'ouvrir le socket");
         exit(0);
     }
 
@@ -135,38 +137,49 @@ int main(int argc, char **argv)
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(atoi(argv[1]));
-    printf("port : %d\n", atoi(argv[1]));
 
     if (bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
-        printf("impossible de faire le bind\n");
+        perror("Impossible de faire le bind");
         exit(0);
     }
 
     listen(sockfd, MAX_PLAYER);
-    printf("En attente de connexions\n");
+    printf("En attente de connexions sur le port %d\n", atoi(argv[1]));
 
     lobby = initialiserLobby();
+
+    // Initialisation des ensembles
+    FD_ZERO(&masterfds);
     FD_ZERO(&readfds);
-    FD_SET(sockfd, &readfds);
+    FD_SET(sockfd, &masterfds);
     max_fd = sockfd;
 
     while (1)
     {
-        fd_set copyfds = readfds;
-        int activity = select(max_fd + 1, &copyfds, NULL, NULL, NULL);
+        // Copier masterfds dans readfds avant select
+        readfds = masterfds;
 
-        if (activity < 0)
+        int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
+
+        if (activity < 0 && errno != EINTR)
         {
-            perror("select error");
-            exit(1);
+            perror("Erreur avec select");
+            break;
         }
-        if (FD_ISSET(sockfd, &copyfds))
+
+        // Gérer les nouvelles connexions
+        if (FD_ISSET(sockfd, &readfds))
         {
-            handle_connection(sockfd, &readfds, &max_fd, lobby);
+            handle_connection(sockfd, &masterfds, &max_fd, lobby);
         }
-        check_if_message(lobby, &copyfds);
+
+        // Gérer les messages des clients
+        check_if_message(lobby, &readfds, &masterfds);
+
+        // Mettre à jour masterfds et max_fd dans handle_connection et check_if_message
     }
+
     close(sockfd);
-    return 1;
+    return 0;
 }
