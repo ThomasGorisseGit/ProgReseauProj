@@ -46,6 +46,18 @@ void handle_server_message(char *message, int *sockfd)
             char *input = lireInput();
             ecrire(sockfd, "coup", destinataire, expediteur, input);
         }
+        else if (strcmp(command, "modifierBio") == 0)
+        {
+            afficher_message(COLOR_GREEN, body);
+        }
+        else if (strcmp(command, "consulterBio") == 0)
+        {
+            afficher_message(COLOR_GREEN, body);
+        }
+        else if (strcmp(command, "classement") == 0)
+        {
+            afficher_message(COLOR_GREEN, body);
+        }
         else if (strcmp(command, "nomValide") == 0)
         {
             nomSet = 1;
@@ -81,6 +93,20 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
     else if (strcmp(user_input, "/aide") == 0)
     {
         afficher_guide();
+    }
+    else if (strncmp(user_input, "/modifierBio ", 13) == 0)
+    {
+        char *bio = user_input + 13;
+        ecrire(sockfd, "modifierBio", nom, "server", bio);
+    }
+    else if (strncmp(user_input, "/consulterBio ", 14) == 0)
+    {
+        char *user = user_input + 14;
+        ecrire(sockfd, "consulterBio", nom, "server", user);
+    }
+    else if (strcmp(user_input, "/classement") == 0)
+    {
+        ecrire(sockfd, "classement", nom, "server", "");
     }
     else if (strncmp(user_input, "/message ", 9) == 0)
     {

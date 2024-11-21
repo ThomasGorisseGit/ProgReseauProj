@@ -110,8 +110,8 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
     }
 
     // récupération du plateau de jeu
-    char *string_plateau = afficherPlateau(jeu);
-    envoyer_plateau(jeu, string_plateau);
+    // char *string_plateau = afficherPlateau(jeu);
+    envoyer_plateau(jeu);
     usleep(2000);
 
     envoyer_le_joueur_courant(jeu);
@@ -122,25 +122,35 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
 
 void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
 {
+    printf("DEBUT COMMANDE JOUER COUP");
+    printf("BODY : %s", body);
+    printf("case : %d", atoi(body));
     int case_depart = atoi(body);
+    printf("CASE DEPART : %d", case_depart);
     Jeu *jeu = lobby->jeux[joueur->idPartie];
-
+    printf("ID JEU %d", joueur->idPartie);
     if (joueur->idPartie == -1)
     {
+        printf("erreur id partie");
         envoyer_erreur(joueur);
         return;
     }
     if (joueur->status != PARTIE)
     {
+        printf("erreur not in partie");
         envoyer_erreur(joueur);
         return;
     }
     if (jeu->current->nom != joueur->nom)
     {
+        printf("Ce n'est pas a ce joueur de jouer");
         envoyer_erreur(joueur);
         return;
     }
+    printf("TEST JOUER COUP");
     int coups_valide = jouerCoup(jeu, case_depart);
+    printf("COUP : %d", coups_valide);
+    printf("TEST COUP INVALIDE");
     if (coups_valide == -1)
     {
         // Le coups est invalide, on redemande a l'utilisateur
@@ -150,28 +160,43 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         demander_case_depart(joueur);
         return;
     }
+    printf("TEST EGALITE");
     if (coups_valide == 0)
     {
         // égalité
         envoyer_egalite(jeu);
         usleep(2000);
         fin_partie(jeu);
-    }
-    if (jeu->vainqueur != NULL)
-    {
-        // On a un vainqueur
-        envoyer_gagnant(jeu);
-        usleep(2000);
-        fin_partie(jeu);
+        calculerElo(jeu->joueur1, jeu->joueur2, 0.5);
     }
 
+    printf("TEST VAINQUEUR");
+    if (jeu->vainqueur->nom == jeu->joueur1->nom || jeu->vainqueur->nom == jeu->joueur2->nom)
+    {
+        // On a un vainqueur
+        printf("ON A UN VAINQUEUR");
+        printf("%s", jeu->vainqueur->nom);
+        envoyer_gagnant(jeu);
+        usleep(2000);
+
+        // On récupère l'élo des joueurs.
+        Joueur *perdant = (jeu->joueur1 == jeu->vainqueur) ? jeu->joueur2 : jeu->joueur1;
+        calculerElo(jeu->vainqueur, perdant, 1);
+        envoyer_elo_joueurs(jeu);
+        usleep(2000);
+        fin_partie(jeu);
+        return;
+    }
+    printf("TEST CONTINUER");
     if (coups_valide == 1)
     {
         // on continue la partie :
-        char *string_plateau = malloc(sizeof(char) * 2048);
-        string_plateau = afficherPlateau(jeu);
-        envoyer_plateau(jeu, string_plateau);
+        // char *string_plateau = malloc(sizeof(char) * 2048);
+        // string_plateau = afficherPlateau(jeu);
+        printf("AFFICHAGE PLATEAU ET ENVOIE");
+        envoyer_plateau(jeu);
         usleep(2000);
+        printf("CHANGEMENT JOUEUR");
         if (jeu->current == jeu->joueur1)
         {
             jeu->current = jeu->joueur2;
@@ -180,8 +205,37 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         {
             jeu->current = jeu->joueur1;
         }
+        printf("ENVOIE JOUEUR COURANT");
         envoyer_le_joueur_courant(jeu);
         usleep(2000);
+        printf("DEMANDER CASE DEPART");
         demander_case_depart(jeu->current);
     }
+    printf("FIN DU COUP %p", jeu->vainqueur);
+}
+
+void commande_modifierBio(Joueur *joueur, char body[MAX_BODY_SIZE])
+{
+    strcpy(joueur->bio, body);
+    envoyer_bio(joueur);
+}
+
+void commande_consulterBio(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE])
+{
+    printf("%s", body);
+    Joueur *j = trouver_joueur(lobby, body);
+    if (j == NULL)
+    {
+        envoyer_erreur(joueur);
+    }
+    else
+    {
+        char message[MAX_MESSAGE_SIZE];
+        snprintf(message, sizeof(message), "/consulterBio #server #%s %s", joueur->nom, j->bio);
+        envoyer_message(joueur, message);
+    }
+}
+void commande_classement(Joueur *joueur, Lobby *lobby)
+{
+    envoyer_classement(lobby, joueur);
 }
