@@ -26,6 +26,8 @@ void envoyer_rejoindre(Joueur *joueur, Lobby *lobby);
 void envoyer_decliner_defi(Joueur *joueur, Joueur *demandeur);
 void envoyer_accepter_defi(Joueur *joueur, Joueur *demandeur);
 void envoyer_bio(Joueur *joueur);
+void envoyer_consulter_bio(Joueur *demandeur, Joueur *jbio);
+
 void envoyer_elo_joueurs(Jeu *jeu);
 void envoyer_classement(Lobby *lobby, Joueur *joueur);
 

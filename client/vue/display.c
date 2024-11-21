@@ -18,3 +18,8 @@ void afficher_message(char *color, char message[MAX_BODY_SIZE])
     }
     printf("%s%s%s\n", color, message, COLOR_RESET);
 }
+
+void afficher_message_nocolour(char message[MAX_BODY_SIZE])
+{
+    printf("%s\n", message);
+}

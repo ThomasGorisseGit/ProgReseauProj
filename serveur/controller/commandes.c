@@ -166,12 +166,13 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         // égalité
         envoyer_egalite(jeu);
         usleep(2000);
-        fin_partie(jeu);
         calculerElo(jeu->joueur1, jeu->joueur2, 0.5);
+        fin_partie(jeu);
+        return;
     }
 
     printf("TEST VAINQUEUR");
-    if (jeu->vainqueur->nom == jeu->joueur1->nom || jeu->vainqueur->nom == jeu->joueur2->nom)
+    if (jeu->vainqueur != NULL && (jeu->vainqueur->nom == jeu->joueur1->nom || jeu->vainqueur->nom == jeu->joueur2->nom))
     {
         // On a un vainqueur
         printf("ON A UN VAINQUEUR");
@@ -183,6 +184,7 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         Joueur *perdant = (jeu->joueur1 == jeu->vainqueur) ? jeu->joueur2 : jeu->joueur1;
         calculerElo(jeu->vainqueur, perdant, 1);
         envoyer_elo_joueurs(jeu);
+
         usleep(2000);
         fin_partie(jeu);
         return;
@@ -222,7 +224,6 @@ void commande_modifierBio(Joueur *joueur, char body[MAX_BODY_SIZE])
 
 void commande_consulterBio(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE])
 {
-    printf("%s", body);
     Joueur *j = trouver_joueur(lobby, body);
     if (j == NULL)
     {
@@ -230,9 +231,7 @@ void commande_consulterBio(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE
     }
     else
     {
-        char message[MAX_MESSAGE_SIZE];
-        snprintf(message, sizeof(message), "/consulterBio #server #%s %s", joueur->nom, j->bio);
-        envoyer_message(joueur, message);
+        envoyer_consulter_bio(joueur, j);
     }
 }
 void commande_classement(Joueur *joueur, Lobby *lobby)

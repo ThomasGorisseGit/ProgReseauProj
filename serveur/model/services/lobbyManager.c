@@ -62,8 +62,8 @@ void fin_partie(Jeu *jeu)
 
     jeu->joueur1->idPartie = -1;
     jeu->joueur2->idPartie = -1;
-    free(jeu->plateau);
-    free(jeu);
+    // free(jeu->plateau);
+    // free(jeu);
 }
 
 Joueur *trouver_joueur(Lobby *lobby, const char *nom)
