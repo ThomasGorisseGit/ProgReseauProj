@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
-
+#include <signal.h>
 #include "../model/donnees/constants.h"
 #include "../model/services/lobbyManager.h"
 #include "../model/services/messageManager.h"

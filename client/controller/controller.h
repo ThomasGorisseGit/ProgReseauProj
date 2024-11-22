@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/select.h>
+#include <signal.h>
 #include "../model/constants.h"
 #include "../vue/display.h"
 #include "../model/messageManager.h"

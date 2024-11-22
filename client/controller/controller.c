@@ -1,6 +1,10 @@
 #include "controller.h"
 
 int nomSet = 0;
+
+void sigint_handler(int sig) {
+    exit(0);
+}
 void handle_server_message(char *message, int *sockfd)
 {
     char command[MAX_COMMAND_SIZE], destinataire[MAX_DESTINATAIRE_SIZE], body[MAX_BODY_SIZE], expediteur[MAX_DESTINATAIRE_SIZE];
@@ -56,10 +60,16 @@ void handle_server_message(char *message, int *sockfd)
         {
             afficher_message(COLOR_GREEN, body);
             char *input = lireInput();
-            if(strcmp(input, "/forfait") == 0){
-                ecrire(sockfd, "forfait", destinataire, expediteur, "Je me retire de la partie.");
-                return;
+            //if input starts with /
+            /*
+            if (input[0] == '/')
+            {
+                handle_client_input(body, sockfd, "server");
+                
+            }else{
+                ecrire(sockfd, "coup", destinataire, expediteur, input);
             }
+            */
             ecrire(sockfd, "coup", destinataire, expediteur, input);
         }
         else if (strcmp(command, "nomValide") == 0)
@@ -120,6 +130,10 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
     else if (strcmp(user_input, "/classement") == 0)
     {
         ecrire(sockfd, "classement", nom, "server", "");
+    }
+    else if(strcmp(user_input, "/forfait") == 0){
+        ecrire(sockfd, "forfait", nom, "server", "l'adversaire s'est retiré de la partie.");
+        return;
     }
     else if (strncmp(user_input, "/messageGlobal", 14) == 0)
         if (strlen(user_input) > 15)
@@ -230,10 +244,16 @@ void event_loop(int sockfd, char *nom)
                 buffer[n] = '\0';
                 handle_server_message(buffer, &sockfd);
             }
-            else
+            else if (n==0)
             {
                 afficher_message(COLOR_RED, "Le serveur s'est déconnecté.");
                 break;
+            }
+            else
+            {
+                // Erreur de lecture
+                perror("Erreur de lecture sur la socket");
+                break;  // Quitter la boucle en cas d'erreur
             }
         }
 
@@ -274,6 +294,7 @@ char *register_user(int sockfd)
 
 int main(int argc, char **argv)
 {
+    signal(SIGINT, sigint_handler);
     if (argc != 3)
     {
         afficher_message(COLOR_RED, "Usage : socket_client <server_ip> <server_port>");
