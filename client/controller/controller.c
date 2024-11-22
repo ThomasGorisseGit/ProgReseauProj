@@ -41,6 +41,10 @@ void handle_server_message(char *message, int *sockfd)
             // afficher_message(COLOR_RED, formatted_message);
             afficher_message_nocolour(formatted_message);
         }
+        else if (strcmp(command, "messageGlobal") == 0)
+        {
+            afficher_message_nocolour(body);
+        }
         else if (strcmp(command, "case") == 0)
         {
             afficher_message(COLOR_GREEN, body);
@@ -51,6 +55,7 @@ void handle_server_message(char *message, int *sockfd)
         {
             nomSet = 1;
             afficher_message(COLOR_GREEN, body);
+            afficher_guide();
         }
         else if (strcmp(command, "nomInvalide") == 0)
         {
@@ -105,6 +110,27 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
     {
         ecrire(sockfd, "classement", nom, "server", "");
     }
+    else if (strncmp(user_input, "/messageGlobal", 14) == 0)
+        if (strlen(user_input) > 15)
+        {
+            char *input = user_input + 15;
+            while (isspace((unsigned char)*input))
+                input++;
+
+            if (strlen(input) > 0)
+            {
+                ecrire(sockfd, "messageGlobal", nom, "server", input);
+            }
+            else
+            {
+                afficher_message(COLOR_YELLOW, "Erreur : Le message global est vide. Utilisez : /messageGlobal <message>\n");
+            }
+        }
+        else
+        {
+            afficher_message(COLOR_YELLOW, "Erreur : Le message global est vide. Utilisez : /messageGlobal <message>\n");
+        }
+
     else if (strncmp(user_input, "/message ", 9) == 0)
     {
         char *input = user_input + 9;

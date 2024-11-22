@@ -75,6 +75,10 @@ void message_handler(Joueur *joueur, char *message)
     {
         commande_classement(joueur, lobby);
     }
+    else if (strcmp(command, "messageGlobal") == 0)
+    {
+        commande_message_global(lobby, expediteur, body);
+    }
     else
     {
         printf("Commande inconnue reçue: %s\n", command);
@@ -99,7 +103,12 @@ int check_if_message(Lobby *lobby, fd_set *readfds, fd_set *masterfds)
             }
             if (n == 0)
             {
-                printf("Client déconnecté\n");
+                printf("Client déconnecté : %s\n", joueur->nom);
+
+                char body[MAX_BODY_SIZE];
+                snprintf(body, sizeof(body), "Le joueur %s s'est déconnecté.", joueur->nom);
+                commande_deconnexion(joueur, lobby);
+
                 close(*joueur->socket);
                 FD_CLR(*joueur->socket, masterfds);
                 free(joueur->nom);
@@ -117,6 +126,7 @@ int check_if_message(Lobby *lobby, fd_set *readfds, fd_set *masterfds)
 
     return 0;
 }
+
 int main(int argc, char **argv)
 {
     int sockfd;

@@ -79,7 +79,7 @@ void jouerCoupBot(Jeu *jeu)
             case_depart = rand() % 6 + 6;
         }
     } while (jouerCoup(jeu, case_depart) == -1);
-    usleep(5000000);
+    usleep(2500000);
     envoyer_plateau(jeu);
     usleep(2000);
     jeu->current = jeu->current == jeu->joueur1 ? jeu->joueur2 : jeu->joueur1;

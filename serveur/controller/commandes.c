@@ -32,6 +32,16 @@ void commande_nom(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE])
         envoyer_nom_invalide(joueur);
     }
 }
+void commande_deconnexion(Joueur *joueur, Lobby *lobby)
+{
+    // Construire le message de déconnexion
+    char message[MAX_MESSAGE_SIZE];
+    snprintf(message, sizeof(message), "/message #server #%s %s Le joueur %s s'est déconnecté.%s\n",
+             joueur->nom, COLOR_RED, joueur->nom, COLOR_RESET);
+
+    // Envoyer le message à tous les joueurs du lobby
+    envoyer_a_tous(lobby, message);
+}
 
 void commande_message(char destinataire[MAX_DESTINATAIRE_SIZE], char expediteur[MAX_DESTINATAIRE_SIZE], Lobby *lobby, char body[MAX_BODY_SIZE])
 {
@@ -53,6 +63,15 @@ void commande_message(char destinataire[MAX_DESTINATAIRE_SIZE], char expediteur[
         envoyer_message(j_expediteur, error_msg);
         printf("Erreur : Le joueur %s n'existe pas ou n'est pas connecté.\n", destinataire);
     }
+}
+
+void commande_message_global(Lobby *lobby, char expediteur[MAX_DESTINATAIRE_SIZE], char body[MAX_BODY_SIZE])
+{
+    Joueur *expediteurJoueur = trouver_joueur(lobby, expediteur);
+
+    envoyer_message_global(expediteurJoueur, lobby, body);
+
+    printf("Message global envoyé par %s à tous les joueurs sauf lui-même : %s\n", expediteur, body);
 }
 
 void commande_defier(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINATAIRE_SIZE])
