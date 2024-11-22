@@ -149,6 +149,10 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         envoyer_erreur(joueur, "Erreur lors de la récupération de l'id de la partie");
         return;
     }
+    if (joueur->idPartie == -2)
+    {
+        return;
+    }
     if (joueur->status != PARTIE)
     {
         printf("erreur not in partie");
@@ -237,4 +241,44 @@ void commande_consulterBio(Joueur *joueur, Lobby *lobby, char body[MAX_BODY_SIZE
 void commande_classement(Joueur *joueur, Lobby *lobby)
 {
     envoyer_classement(lobby, joueur);
+}
+void commande_forfait(Joueur *joueur, Lobby *lobby)
+{
+    if (lobby->jeux[joueur->idPartie] == NULL)
+    {
+        envoyer_erreur(joueur, "La partie référencée n'existe pas.\n");
+        return;
+    }
+
+    if (joueur->idPartie >= 0 && joueur->idPartie < MAX_PARTIES)
+    {
+        Jeu *jeu = lobby->jeux[joueur->idPartie];
+        if (jeu != NULL)
+        {
+            // Identifie l'autre joueur dans la partie
+            Joueur *adversaire = (jeu->joueur1 == joueur) ? jeu->joueur2 : jeu->joueur1;
+
+            // Envoyer un message à l'autre joueur
+            char message[MAX_MESSAGE_SIZE];
+            snprintf(message, sizeof(message), "Le joueur %s a abandonné la partie. Vous avez gagné !", joueur->nom);
+            if (adversaire != NULL)
+            {
+                adversaire->idPartie = -2;
+                envoyer_erreur(adversaire, message);
+            }
+            adversaire->status = LOBBY;
+            // Libère les ressources associées à la partie
+            free(jeu);
+            lobby->jeux[joueur->idPartie] = NULL;
+        }
+    }
+    else
+    {
+        envoyer_erreur(joueur, "Le joueur n'est dans aucune partie valide.\n");
+        return;
+    }
+
+    // Réinitialise l'état du joueur
+    joueur->idPartie = -1;
+    joueur->status = LOBBY;
 }

@@ -75,6 +75,11 @@ void message_handler(Joueur *joueur, char *message)
     {
         commande_message_global(lobby, expediteur, body);
     }
+    else if (strcmp(command, "forfait") == 0)
+    {
+        commande_forfait(joueur, lobby);
+    }
+
     else
     {
         printf("Commande inconnue reçue: %s\n", command);
@@ -100,11 +105,22 @@ int check_if_message(Lobby *lobby, fd_set *readfds, fd_set *masterfds)
             if (n == 0)
             {
                 printf("Client déconnecté : %s\n", joueur->nom);
+                if (lobby->jeux[joueur->idPartie] == NULL)
+                {
+                    printf("Erreur : La partie référencée n'existe pas.\n");
+                    continue;
+                }
 
+                // Si le joueur était en partie, mettre fin à la partie
+                if (joueur->idPartie >= 0 && joueur->idPartie < MAX_PARTIES)
+                {
+                    commande_forfait(joueur, lobby);
+                }
+
+                // Retirer le joueur du lobby
                 char body[MAX_BODY_SIZE];
                 snprintf(body, sizeof(body), "Le joueur %s s'est déconnecté.", joueur->nom);
                 commande_deconnexion(joueur, lobby);
-
                 close(*joueur->socket);
                 FD_CLR(*joueur->socket, masterfds);
                 free(joueur->nom);

@@ -11,6 +11,13 @@ void handle_server_message(char *message, int *sockfd)
         {
             afficher_message_nocolour(body);
         }
+        else if (strcmp(command, "finPartie") == 0)
+        {
+            char formatted_message[MAX_MESSAGE_SIZE];
+            snprintf(formatted_message, sizeof(formatted_message), "La partie est terminée : %s", body);
+            afficher_message(COLOR_GREEN, formatted_message);
+        }
+
         else if (strcmp(command, "defier") == 0)
         {
             char formatted_message[MAX_MESSAGE_SIZE];
@@ -151,6 +158,11 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
             afficher_message(COLOR_YELLOW, "Erreur : Utilisez un ':' pour séparer le destinataire et le message.");
         }
     }
+    else if (strcmp(user_input, "/forfait") == 0)
+    {
+        ecrire(sockfd, "forfait", nom, "server", "Je me retire de la partie.");
+    }
+
     else
     {
         printf("%s - %d\n", user_input, strncmp(user_input, "/defier ", 8));
