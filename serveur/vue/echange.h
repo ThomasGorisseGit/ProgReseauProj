@@ -37,5 +37,5 @@ void envoyer_classement(Lobby *lobby, Joueur *joueur);
 void afficher_tableau(char *buffer, size_t buffer_size,
                       const char **headers, size_t nb_colonnes,
                       const char *data[][MAX_COLUMNS], size_t nb_lignes);
-
+void envoyer_abandon(Joueur *looooooser, Joueur *adversaire);
 #endif // ECHANGE_H

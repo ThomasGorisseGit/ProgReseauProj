@@ -56,6 +56,10 @@ void handle_server_message(char *message, int *sockfd)
         {
             afficher_message(COLOR_GREEN, body);
             char *input = lireInput();
+            if(strcmp(input, "/forfait") == 0){
+                ecrire(sockfd, "forfait", destinataire, expediteur, "Je me retire de la partie.");
+                return;
+            }
             ecrire(sockfd, "coup", destinataire, expediteur, input);
         }
         else if (strcmp(command, "nomValide") == 0)
@@ -291,6 +295,7 @@ int main(int argc, char **argv)
     // Boucle principale
     event_loop(sockfd, nom);
 
+    free(nom);
     close(sockfd);
     return EXIT_SUCCESS;
 }

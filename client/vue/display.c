@@ -11,6 +11,7 @@ void afficher_guide()
     printf(COLOR_GREEN "/modifierBio <message>" COLOR_RESET " - Modifier la description de votre profil\n");
     printf(COLOR_GREEN "/consulterBio <nom>" COLOR_RESET " - Consulter la description d'un joueur\n");
     printf(COLOR_GREEN "/classement" COLOR_RESET " - Consulter le classement des meilleurs joueurs\n");
+    printf(COLOR_GREEN "/forfait" COLOR_RESET " - Déclarer forfait\n");
 }
 
 void afficher_message(char *color, char message[MAX_BODY_SIZE])

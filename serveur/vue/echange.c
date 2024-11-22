@@ -323,3 +323,9 @@ void envoyer_nom_invalide(Joueur *joueur)
     snprintf(message, sizeof(message), "/nomInvalide #server #%s Pseudo Invalide, veuillez en choisir un autre !", joueur->nom);
     envoyer_message(joueur, message);
 }
+
+void envoyer_abandon(Joueur *looooooser, Joueur *adversaire){
+    char message[MAX_MESSAGE_SIZE];
+    snprintf(message, sizeof(message), "/message #server #%s %s a abandonné la partie. Vous avez gagné !", looooooser->nom, adversaire->nom);
+    envoyer_message(adversaire, message);
+}

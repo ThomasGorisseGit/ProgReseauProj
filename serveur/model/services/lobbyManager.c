@@ -27,7 +27,6 @@ void handle_connection(int sockfd, fd_set *readfds, int *max_fd, Lobby *lobby)
         free(newsockfd);
         return;
     }
-
     printf("Nouvelle connexion acceptée\n");
 
     Joueur *joueur = malloc(sizeof(Joueur));

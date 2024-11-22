@@ -306,12 +306,10 @@ void commande_forfait(Joueur *joueur, Lobby *lobby)
             Joueur *adversaire = (jeu->joueur1 == joueur) ? jeu->joueur2 : jeu->joueur1;
 
             // Envoyer un message à l'autre joueur
-            char message[MAX_MESSAGE_SIZE];
-            snprintf(message, sizeof(message), "Le joueur %s a abandonné la partie. Vous avez gagné !", joueur->nom);
             if (adversaire != NULL)
             {
                 adversaire->idPartie = -2;
-                envoyer_erreur(adversaire, message);
+                envoyer_abandon(joueur, adversaire);
                 usleep(2000);
             }
             adversaire->status = LOBBY;
