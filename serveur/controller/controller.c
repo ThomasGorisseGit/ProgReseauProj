@@ -109,12 +109,6 @@ int check_if_message(Lobby *lobby, fd_set *readfds, fd_set *masterfds)
             if (n == 0)
             {
                 printf("Client déconnecté : %s\n", joueur->nom);
-                if (lobby->jeux[joueur->idPartie] == NULL)
-                {
-                    printf("Erreur : La partie référencée n'existe pas.\n");
-                    continue;
-                }
-
                 // Si le joueur était en partie, mettre fin à la partie
                 if (joueur->idPartie >= 0 && joueur->idPartie < MAX_PARTIES)
                 {

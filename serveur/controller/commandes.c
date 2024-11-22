@@ -190,8 +190,7 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
     }
     if (joueur->idPartie == -2)
     {
-        calculerElo(joueur, NULL, 1);
-        envoyer_elo_joueurs(jeu);
+        // l'autre joueur a abandonné
         return;
     }
     if (joueur->status != PARTIE)
@@ -313,9 +312,15 @@ void commande_forfait(Joueur *joueur, Lobby *lobby)
             {
                 adversaire->idPartie = -2;
                 envoyer_erreur(adversaire, message);
+                usleep(2000);
             }
             adversaire->status = LOBBY;
             // Libère les ressources associées à la partie
+            jeu->vainqueur = adversaire;
+            calculerElo(adversaire, joueur, 1);
+            envoyer_elo_joueurs(jeu);
+            usleep(2000);
+            envoyer_gagnant(jeu);
             free(jeu);
             lobby->jeux[joueur->idPartie] = NULL;
         }

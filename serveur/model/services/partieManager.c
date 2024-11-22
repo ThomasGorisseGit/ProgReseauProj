@@ -3,7 +3,6 @@ void qui_commence(Jeu *jeu)
 {
     int nombreAleatoire = (rand() % 2) + 1;
 
-    printf("Le nombre généré est %d\n", nombreAleatoire);
     if (nombreAleatoire == 1)
     {
         jeu->current = jeu->joueur1;
@@ -58,16 +57,20 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
 void calculerElo(Joueur *joueur1, Joueur *joueur2, int resultatA)
 {
 
-    if (joueur1 != NULL)
+    if (joueur1 != NULL && joueur2 != NULL)
     {
         double E1 = 1.0 / (1.0 + pow(10, (joueur2->elo - joueur1->elo) / 400.0));
         joueur1->elo = joueur1->elo + FACTEUR_DAJUSTEMENT_ELO * (resultatA - E1);
-    }
-    if (joueur2 != NULL)
-    {
         double E2 = 1.0 / (1.0 + pow(10, (joueur1->elo - joueur2->elo) / 400.0));
-
         joueur2->elo = joueur2->elo + FACTEUR_DAJUSTEMENT_ELO * ((1 - resultatA) - E2);
+    }
+    if (joueur2 != NULL && joueur1 == NULL)
+    {
+        joueur2->elo = joueur2->elo + FACTEUR_DAJUSTEMENT_ELO * ((1 - resultatA));
+    }
+    else if(joueur1 != NULL && joueur2 == NULL)
+    {
+        joueur1->elo = joueur1->elo + FACTEUR_DAJUSTEMENT_ELO * (resultatA);
     }
 }
 

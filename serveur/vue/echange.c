@@ -201,6 +201,10 @@ void envoyer_liste_joueurs(Lobby *lobby, Joueur *joueur)
         {
             status = "Initialisation";
         }
+        else if (lobby->joueurs[i]->status == DEFI)
+        {
+            status = "Defi";
+        }
         else
         {
             status = "Partie";

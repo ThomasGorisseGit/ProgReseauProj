@@ -170,8 +170,6 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
 
     else
     {
-        printf("%s - %d\n", user_input, strncmp(user_input, "/defier ", 8));
-        afficher_message(COLOR_RED, user_input);
         afficher_message(COLOR_YELLOW, "Commande inconnue. Tapez /aide pour voir les commandes disponibles.");
     }
 }
