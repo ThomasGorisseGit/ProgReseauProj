@@ -57,11 +57,18 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
 }
 void calculerElo(Joueur *joueur1, Joueur *joueur2, int resultatA)
 {
-    double E1 = 1.0 / (1.0 + pow(10, (joueur2->elo - joueur1->elo) / 400.0));
-    double E2 = 1.0 / (1.0 + pow(10, (joueur1->elo - joueur2->elo) / 400.0));
 
-    joueur1->elo = joueur1->elo + FACTEUR_DAJUSTEMENT_ELO * (resultatA - E1);
-    joueur2->elo = joueur2->elo + FACTEUR_DAJUSTEMENT_ELO * ((1 - resultatA) - E2);
+    if (joueur1 != NULL)
+    {
+        double E1 = 1.0 / (1.0 + pow(10, (joueur2->elo - joueur1->elo) / 400.0));
+        joueur1->elo = joueur1->elo + FACTEUR_DAJUSTEMENT_ELO * (resultatA - E1);
+    }
+    if (joueur2 != NULL)
+    {
+        double E2 = 1.0 / (1.0 + pow(10, (joueur1->elo - joueur2->elo) / 400.0));
+
+        joueur2->elo = joueur2->elo + FACTEUR_DAJUSTEMENT_ELO * ((1 - resultatA) - E2);
+    }
 }
 
 void jouerCoupBot(Jeu *jeu)

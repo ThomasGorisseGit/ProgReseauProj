@@ -190,6 +190,8 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
     }
     if (joueur->idPartie == -2)
     {
+        calculerElo(joueur, NULL, 1);
+        envoyer_elo_joueurs(jeu);
         return;
     }
     if (joueur->status != PARTIE)
@@ -219,7 +221,6 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         // égalité
         envoyer_egalite(jeu);
         usleep(2000);
-        calculerElo(jeu->joueur1, jeu->joueur2, 0.5);
         fin_partie(jeu);
         return;
     }
