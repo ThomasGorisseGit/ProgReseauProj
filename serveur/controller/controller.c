@@ -38,6 +38,10 @@ void message_handler(Joueur *joueur, char *message)
     {
         commande_defier(lobby, joueur, destinataire);
     }
+    else if (strcmp(command, "defierBot") == 0)
+    {
+        commande_defier_bot(lobby, joueur);
+    }
 
     else if (strcmp(command, "declinerDefi") == 0)
     {

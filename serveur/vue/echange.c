@@ -2,6 +2,10 @@
 #include "echange.h"
 int envoyer_message(Joueur *joueur, char *message)
 {
+    if (joueur->socket == NULL)
+    {
+        return 0;
+    }
     int n;
     n = write(*joueur->socket, message, strlen(message));
     if (n < 0)
@@ -199,7 +203,7 @@ void envoyer_liste_joueurs(Lobby *lobby, Joueur *joueur)
         }
         else
         {
-            status = "En partie";
+            status = "Partie";
         }
         snprintf(ligne, sizeof(ligne), "|\t\t%s\t\t|\t\t%s\t\t|\n", lobby->joueurs[i]->nom, status);
         strncat(message, ligne, totalLength - strlen(message) - 1);

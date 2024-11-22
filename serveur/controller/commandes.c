@@ -110,13 +110,11 @@ void commande_declinerDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
 
 void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_DESTINATAIRE_SIZE])
 {
-    printf("Recherche joueur");
     Joueur *demandeur = trouver_joueur(lobby, destinataire);
     if (demandeur == NULL)
     {
         envoyer_erreur(joueur, "Le joueur n'existe pas ou n'est pas connecté"); // Le joueur %s n'existe pas ou n'est pas connecté.
     }
-    printf("Joueur trouvé%s", demandeur->nom);
     envoyer_accepter_defi(joueur, demandeur);
     usleep(2000);
 
@@ -139,6 +137,47 @@ void commande_accepterDefi(Lobby *lobby, Joueur *joueur, char destinataire[MAX_D
     demander_case_depart(jeu->current);
 }
 
+void commande_defier_bot(Lobby *lobby, Joueur *joueur)
+{
+    Joueur *bot = malloc(sizeof(Joueur));
+    bot->socket = NULL;
+
+    bot->nom = malloc(MAX_NAME_SIZE * sizeof(char));
+    strcpy(bot->nom, "IA");
+
+    bot->bio = malloc(MAX_NAME_SIZE * sizeof(char));
+    strcpy(bot->bio, "Je suis un robot");
+
+    bot->status = INIT;
+    bot->type = IA;
+    bot->idPartie = -1;
+    bot->idJoueur = lobby->nbJoueurs;
+    bot->elo = 1000.0;
+    bot->score = 0;
+    // // Initialiser la partie
+    initialiser_jeu(lobby, bot, joueur);
+
+    Jeu *jeu = lobby->jeux[joueur->idPartie];
+    if (jeu == NULL)
+    {
+        perror("Erreur d'allocation mémoire pour le jeu");
+        exit(1);
+    }
+
+    envoyer_plateau(jeu);
+    usleep(2000);
+    envoyer_le_joueur_courant(jeu);
+    usleep(2000);
+
+    if (jeu->current->type == IA)
+    {
+        jouerCoupBot(jeu);
+    }
+    else
+    {
+        demander_case_depart(jeu->current);
+    }
+}
 void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
 {
     int case_depart = atoi(body);
@@ -214,9 +253,17 @@ void commande_jouerCoup(Lobby *lobby, Joueur *joueur, char body[MAX_BODY_SIZE])
         {
             jeu->current = jeu->joueur1;
         }
+
         envoyer_le_joueur_courant(jeu);
         usleep(2000);
-        demander_case_depart(jeu->current);
+        if (jeu->current->type == IA)
+        {
+            jouerCoupBot(jeu);
+        }
+        else
+        {
+            demander_case_depart(jeu->current);
+        }
     }
 }
 

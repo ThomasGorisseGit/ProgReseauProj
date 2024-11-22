@@ -2,10 +2,8 @@
 void qui_commence(Jeu *jeu)
 {
     int nombreAleatoire = (rand() % 2) + 1;
-    printf("\033[31m"
-           "Le nombre généré est %d\n\033[0m", // Remplacement par %d pour un entier
-           nombreAleatoire);
 
+    printf("Le nombre généré est %d\n", nombreAleatoire);
     if (nombreAleatoire == 1)
     {
         jeu->current = jeu->joueur1;
@@ -18,10 +16,8 @@ void qui_commence(Jeu *jeu)
 
 void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
 {
-    printf("debut Modif status\n");
     demandeur->status = PARTIE;
     joueur->status = PARTIE;
-    printf("fin Modif status\n");
 
     // Initialiser la partie
     Jeu *jeu = malloc(sizeof(Jeu));
@@ -30,7 +26,6 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
         perror("Erreur d'allocation mémoire pour le jeu");
         exit(EXIT_FAILURE);
     }
-    printf("debut jeu\n");
 
     jeu->joueur1 = demandeur;
     jeu->joueur2 = joueur;
@@ -43,10 +38,8 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
         free(jeu);
         exit(EXIT_FAILURE);
     }
-    printf("init plateau\n");
 
     initialiserPlateau(jeu);
-    printf("fin init plateau\n");
 
     if (lobby->nbJeux >= MAX_PARTIES)
     {
@@ -54,15 +47,11 @@ void initialiser_jeu(Lobby *lobby, Joueur *demandeur, Joueur *joueur)
         free(jeu);
         exit(EXIT_FAILURE);
     }
-    printf("debut idPartie\n");
     joueur->idPartie = lobby->nbJeux;
     demandeur->idPartie = lobby->nbJeux;
-    printf("fin idPartie\n");
 
-    printf("debut ajout jeu\n");
     lobby->jeux[lobby->nbJeux] = jeu;
     lobby->nbJeux++;
-    printf("fin ajout jeu\n");
     srand(time(NULL));
     qui_commence(jeu);
 }
@@ -73,4 +62,28 @@ void calculerElo(Joueur *joueur1, Joueur *joueur2, int resultatA)
 
     joueur1->elo = joueur1->elo + FACTEUR_DAJUSTEMENT_ELO * (resultatA - E1);
     joueur2->elo = joueur2->elo + FACTEUR_DAJUSTEMENT_ELO * ((1 - resultatA) - E2);
+}
+
+void jouerCoupBot(Jeu *jeu)
+{
+    envoyer_bio(jeu->current);
+    int case_depart = 0;
+    do
+    {
+        if (jeu->current->nom == jeu->joueur1->nom)
+        {
+            case_depart = rand() % 6;
+        }
+        else
+        {
+            case_depart = rand() % 6 + 6;
+        }
+    } while (jouerCoup(jeu, case_depart) == -1);
+    usleep(2500000);
+    envoyer_plateau(jeu);
+    usleep(2000);
+    jeu->current = jeu->current == jeu->joueur1 ? jeu->joueur2 : jeu->joueur1;
+    envoyer_le_joueur_courant(jeu);
+    usleep(2000);
+    demander_case_depart(jeu->current);
 }

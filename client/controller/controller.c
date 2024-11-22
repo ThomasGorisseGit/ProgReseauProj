@@ -62,6 +62,7 @@ void handle_server_message(char *message, int *sockfd)
         {
             nomSet = 1;
             afficher_message(COLOR_GREEN, body);
+            afficher_guide();
         }
         else if (strcmp(command, "nomInvalide") == 0)
         {
@@ -93,6 +94,10 @@ void handle_client_input(char *user_input, int *sockfd, char *nom)
     {
         char *target = user_input + 8;
         ecrire(sockfd, "defier", nom, target, "");
+    }
+    else if (strcmp(user_input, "/defierBot") == 0)
+    {
+        ecrire(sockfd, "defierBot", nom, "server", "");
     }
     else if (strcmp(user_input, "/aide") == 0)
     {
